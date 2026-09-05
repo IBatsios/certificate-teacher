@@ -1,0 +1,15 @@
+# Generated from docs/intake.md by kickoff v0.1.0. Edit the intake, not this file.
+# Development database only. The password is a local development password on a port only this machine reaches.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: teacher
+      POSTGRES_PASSWORD: teacher
+      POSTGRES_DB: teacher
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+volumes:
+  db-data:

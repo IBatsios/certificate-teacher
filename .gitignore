@@ -1,0 +1,18 @@
+# Generated from docs/intake.md by kickoff v0.1.0. Edit the intake, not this file.
+
+# Environment and secrets: never commit these
+.env
+.env.*
+!.env.example
+
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
