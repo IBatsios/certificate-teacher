@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02.
 
-**Status:** ready
+**Status:** in progress on `feature/deploy-railway` since 2026-09-06.
 
 ## Steps, in order
 
