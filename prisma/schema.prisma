@@ -29,9 +29,10 @@ model User {
   role          Role          @default(student)
   passwordHash  String?
   createdAt     DateTime      @default(now())
-  accounts      Account[]
-  sessions      Session[]
-  testAttempts  TestAttempt[]
+  accounts         Account[]
+  sessions         Session[]
+  testAttempts     TestAttempt[]
+  learningSessions LearningSession[]
 }
 
 // Auth.js: a sign-in method linked to a user. Unused until an OAuth provider
@@ -83,4 +84,36 @@ model TestAttempt {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// A student's run through the lessons, named to stay clear of Auth.js's
+// Session. One is active per student at a time; "start over" archives it and
+// begins another. Sessions are never deleted by the app (see D33).
+enum SessionStatus {
+  active
+  archived
+}
+
+model LearningSession {
+  id         String         @id @default(cuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status     SessionStatus  @default(active)
+  startedAt  DateTime       @default(now())
+  archivedAt DateTime?
+  steps      StepProgress[]
+
+  @@index([userId, status])
+}
+
+// One lesson step a student has ticked done in a session. The step keys come
+// from the lesson content under content/lessons, not from the database.
+model StepProgress {
+  id        String          @id @default(cuid())
+  sessionId String
+  session   LearningSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  stepKey   String
+  doneAt    DateTime        @default(now())
+
+  @@unique([sessionId, stepKey])
 }

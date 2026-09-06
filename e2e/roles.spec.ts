@@ -28,7 +28,7 @@ async function newPage(browser: Browser): Promise<Page> {
 
 test("a student cannot open the admin pages", async ({ page }) => {
   await signUpWithPassword(page, uniqueEmail("student"));
-  await expect(page).toHaveURL(/\/test$/);
+  await expect(page).toHaveURL(/\/lessons\/certificates$/);
 
   await page.goto("/admin/users");
 
@@ -63,7 +63,7 @@ test("the admin promotes a student, who is told to sign in again, but cannot cha
   const studentEmail = uniqueEmail("student");
   const student = await newPage(browser);
   await signUpWithPassword(student, studentEmail);
-  await expect(student).toHaveURL(/\/test$/);
+  await expect(student).toHaveURL(/\/lessons\/certificates$/);
 
   const admin = await newPage(browser);
   await signInWithLink(admin, adminEmail());
