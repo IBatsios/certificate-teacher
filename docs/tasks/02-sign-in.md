@@ -6,7 +6,7 @@
 
 **Blocked by:** 01.
 
-**Status:** built on `feature/sign-in` on 2026-09-06; waiting on the pull request and a green CI run. See `docs/handoff-items/handoff-after-task-02.md`.
+**Status:** built on `feature/sign-in` on 2026-09-06; pull request #2 open with CI green, waiting on the merge. See `docs/handoff-items/handoff-after-task-02.md`.
 
 ## Steps, in order
 
@@ -25,7 +25,7 @@
 - [x] Every row of the role matrix is enforced and has a test. (`src/lib/access.test.ts` for the matrix, `e2e/roles.spec.ts` for the pages, `src/lib/role-change.test.ts` for role changes.)
 - [x] `AUTH_SECRET` and every provider credential are in `.env` only, with placeholders in `.env.example`. (`EMAIL_SERVER`, `EMAIL_FROM`, `ADMIN_EMAIL` replace `AUTH_RESEND_KEY`; see D18.)
 - [x] The auth migration is committed under `prisma/migrations/`. (`20260906184654_auth`; it deletes the placeholder attempts first.)
-- [ ] Earlier tests still pass; CI is green. (All pass locally, 28 unit and 8 browser tests; CI needs the push and the pull request.)
+- [x] Earlier tests still pass; CI is green. (28 unit and 9 browser tests; both CI jobs green on pull request #2.)
 
 ## Suggested skills
 
