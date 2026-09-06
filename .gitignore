@@ -1,18 +1,46 @@
-# Generated from docs/intake.md by kickoff v0.1.0. Edit the intake, not this file.
+# Generated from docs/intake.md by kickoff v0.1.0, then extended in Task 01. A kickoff regenerate overwrites this file; re-apply everything below the environment block afterwards.
 
 # Environment and secrets: never commit these
 .env
 .env.*
 !.env.example
 
+# Database dumps written by the runbook's backup step: never commit these
+backup-*.sql
+
+# dependencies
 node_modules/
+.pnp
+.pnp.*
+
+# next.js
 .next/
-dist/
+out/
 build/
+dist/
+
+# prisma: the client is generated on install (postinstall) and on build
+src/generated/
+
+# testing
 coverage/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# vercel
+.vercel
 
 # OS and editor noise
 .DS_Store
 Thumbs.db
+*.pem
 .idea/
 .vscode/

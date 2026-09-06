@@ -1,0 +1,20 @@
+// Prisma schema. The database URL lives in prisma7.config.ts (read from .env).
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// One submission of the test. studentKey is the placeholder identity from
+// src/lib/placeholder-student.ts until Task 02 replaces it with a User.
+model TestAttempt {
+  id         String   @id @default(cuid())
+  studentKey String
+  passed     Boolean
+  createdAt  DateTime @default(now())
+}
