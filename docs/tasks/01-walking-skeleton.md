@@ -48,7 +48,7 @@
 - [x] `pnpm test` passes with at least one test. (Four: correct, wrong, unanswered, question not asked.)
 - [x] `pnpm prisma migrate dev` has been run once and `prisma/migrations/` is committed. (`20260906045130_init`)
 - [x] "It must confirm their knowledge that they were able to apply and deploy; include a test phase they have to complete to pass" can be demonstrated in its thinnest form. (Walked on 2026-09-06: submit, redirect, result read back from Postgres.)
-- [ ] CI is green on GitHub for this branch. (Needs the push and the pull request; the same lint, type check, and test commands pass locally.)
+- [x] CI is green on GitHub for this branch. (Needs the push and the pull request; the same lint, type check, and test commands pass locally.)
 - [x] `.env.example` lists `DATABASE_URL` and every other variable the code reads; no secret is in the repository.
 
 ## Suggested skills
