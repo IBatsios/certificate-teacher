@@ -9,6 +9,7 @@ export const SIGN_IN_MESSAGES = {
   "link-not-sent":
     "We could not send the sign-in link. Wait a moment and try again.",
   "account-ready": "Your account is ready. Sign in to continue.",
+  "too-many-attempts": "Too many attempts. Wait fifteen minutes and try again.",
   Verification:
     "That sign-in link has expired or was already used. Ask for a new one below.",
   Default: "Something went wrong while signing you in. Try again.",

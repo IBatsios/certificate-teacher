@@ -1,4 +1,4 @@
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, newPage, test } from "./fixtures";
 import {
   accountNav,
   pageMessage,
@@ -19,11 +19,6 @@ function adminEmail(): string {
     );
   }
   return email;
-}
-
-async function newPage(browser: Browser): Promise<Page> {
-  const context = await browser.newContext();
-  return context.newPage();
 }
 
 test("a student cannot open the admin pages", async ({ page }) => {

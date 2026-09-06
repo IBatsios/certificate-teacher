@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import { defineConfig, devices } from "@playwright/test";
 
 // The browser tests start their own copy of the app on this port so they never
@@ -12,6 +13,10 @@ const BASE_URL = `http://localhost:${PORT}`;
 // accounts end in @e2e.test and global-teardown.ts removes them.
 const runId = Date.now().toString(36);
 process.env.E2E_ADMIN_EMAIL ??= `admin-${runId}@e2e.test`;
+
+// The app runs with an origin secret, as it does behind Cloudflare in
+// production (D44); e2e/fixtures.ts sends it on every request.
+process.env.E2E_ORIGIN_SECRET ??= randomUUID();
 
 export default defineConfig({
   testDir: "e2e",
@@ -33,9 +38,12 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       ADMIN_EMAIL: process.env.E2E_ADMIN_EMAIL,
-      // `next start` is production mode, where Auth.js refuses a host it was
-      // not told about. Railway needs the same setting (Task 08).
+      // Production-shaped: `next start` refuses a host it was not told
+      // about, and the startup check in src/instrumentation.ts wants all
+      // three together. Railway gets the same three (D41).
       AUTH_TRUST_HOST: "true",
+      AUTH_URL: BASE_URL,
+      ORIGIN_SECRET: process.env.E2E_ORIGIN_SECRET,
     },
   },
 });

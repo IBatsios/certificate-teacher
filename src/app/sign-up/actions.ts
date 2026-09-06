@@ -7,6 +7,7 @@ import { signIn } from "@/auth";
 import { HOME_BY_ROLE } from "@/lib/access";
 import { hashPassword, MIN_PASSWORD_LENGTH } from "@/lib/password";
 import { normalizeEmail, roleForNewUser } from "@/lib/roles";
+import { allowSignUp } from "@/lib/sign-in-limits";
 import { createUserWithPassword, findUserByEmail } from "@/lib/users";
 import { signInPageWithMessage } from "../sign-in/messages";
 import { signUpPageWithMessage, type SignUpMessageKey } from "./messages";
@@ -21,10 +22,11 @@ const signUpFormSchema = z.object({
 const UNIQUE_VIOLATION = "P2002";
 
 /**
- * Creates a student account, signs the person in, and sends them to the test.
- * Only students are created here: typing an address proves nothing, so the
- * admin's account can only come from a magic link (see D30). Redirects
- * happen outside try/catch because `redirect` throws.
+ * Creates a student account, signs the person in, and sends them to the
+ * lesson. Only students are created here: typing an address proves nothing,
+ * so the admin's account can only come from a magic link (see D30). The
+ * address limit runs before the hash, which is the expensive part (D39).
+ * Redirects happen outside try/catch because `redirect` throws.
  */
 export async function signUpWithPassword(formData: FormData): Promise<void> {
   const parsed = signUpFormSchema.safeParse({
@@ -35,6 +37,9 @@ export async function signUpWithPassword(formData: FormData): Promise<void> {
     redirect(signUpPageWithMessage(messageKeyFor(parsed.error)));
   }
 
+  if (!(await allowSignUp())) {
+    redirect(signUpPageWithMessage("too-many-attempts"));
+  }
   const email = normalizeEmail(parsed.data.email);
   const created = await tryCreateUser(email, parsed.data.password);
   if (created.kind === "failed") {
