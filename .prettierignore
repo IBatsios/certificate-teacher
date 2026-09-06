@@ -1,0 +1,11 @@
+# Generated or machine-owned; not ours to format
+node_modules/
+.next/
+src/generated/
+prisma/migrations/
+pnpm-lock.yaml
+coverage/
+*.sql
+
+# Kickoff owns docs/: the intake is hand-written and the rest is generated from it
+docs/

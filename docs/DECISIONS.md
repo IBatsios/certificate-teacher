@@ -17,3 +17,15 @@ One line per decision. Newest at the bottom. Reasons come from the intake; where
 ---
 
 ## Added after the build
+
+| # | Decision | Why | Source |
+|---|---|---|---|
+| D8 | Prisma pinned to 7.10.0 for the CLI, `@prisma/client`, and `@prisma/adapter-pg` | On 2026-09-06 the CLI's `latest` tag pointed at an 8.0 release candidate while the client's was 7.10.0; matched stable versions, with the v7 docs at prisma.io/docs/orm/v7 | Task 01 |
+| D9 | Prisma 7 layout: `prisma7.config.ts` as `prisma init` writes it, client generated into `src/generated/prisma` (gitignored) by a `postinstall` script, Postgres reached through `@prisma/adapter-pg` | Prisma 7 requires a config file and a driver adapter; keeping the tool's own file name avoids fighting it | Task 01 |
+| D10 | The Next.js app was scaffolded in a scratch folder and copied in | `create-next-app` refuses a directory holding `CLAUDE.md`, `.env`, `docker-compose.yml`, or a README | Task 01 |
+| D11 | Vitest runs in Node only, for `src/**/*.test.ts`; no jsdom or Testing Library until a component test needs them. End-to-end tests are Playwright's, under `e2e/` | YAGNI; keeps CI free of a browser until Task 03 | Task 01 |
+| D12 | CI runs lint and type check as well as the tests | Same three checks as the pre-commit hook, so a green pull request means the same thing locally and on GitHub | Task 01 |
+| D13 | Skeleton pass rule: every question answered correctly. Placeholder until Task 06 sets the real pass mark | One question exists; any other rule would be invented | Task 01 |
+| D14 | `.gitignore` excludes `backup-*.sql`, the files the runbook's backup step writes into the project root | A database dump must never be committed | Task 01 |
+| D15 | Prettier and lint-staged skip `docs/` | `docs/intake.md` is hand-written and the rest is generated from it; tooling must not rewrite either | Task 01 |
+| D16 | Three small additions the task file did not name: the home page's boilerplate replaced by one paragraph and a link to `/test`; Zod for the server action's form validation; the Next-generated `AGENTS.md` committed | The scaffold's demo page is not the product; the Projects-root conventions say Zod at every boundary; `next dev` re-creates `AGENTS.md`, so committing it keeps the tree clean | Task 01 review |

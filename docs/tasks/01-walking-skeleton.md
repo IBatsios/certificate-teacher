@@ -6,7 +6,7 @@
 
 **Blocked by:** None. Phase 0 of the runbook must be complete first: database reachable, `.env` filled.
 
-**Status:** ready
+**Status:** built on `feature/walking-skeleton` on 2026-09-06; waiting on the pull request and a green CI run. See `docs/handoff-items/handoff-after-task-01.md`.
 
 ## Steps, in order
 
@@ -44,12 +44,12 @@
 
 ## Acceptance criteria
 
-- [ ] `pnpm dev` starts with no errors and the test page responds.
-- [ ] `pnpm test` passes with at least one test.
-- [ ] `pnpm prisma migrate dev` has been run once and `prisma/migrations/` is committed.
-- [ ] "It must confirm their knowledge that they were able to apply and deploy; include a test phase they have to complete to pass" can be demonstrated in its thinnest form.
-- [ ] CI is green on GitHub for this branch.
-- [ ] `.env.example` lists `DATABASE_URL` and every other variable the code reads; no secret is in the repository.
+- [x] `pnpm dev` starts with no errors and the test page responds.
+- [x] `pnpm test` passes with at least one test. (Four: correct, wrong, unanswered, question not asked.)
+- [x] `pnpm prisma migrate dev` has been run once and `prisma/migrations/` is committed. (`20260906045130_init`)
+- [x] "It must confirm their knowledge that they were able to apply and deploy; include a test phase they have to complete to pass" can be demonstrated in its thinnest form. (Walked on 2026-09-06: submit, redirect, result read back from Postgres.)
+- [ ] CI is green on GitHub for this branch. (Needs the push and the pull request; the same lint, type check, and test commands pass locally.)
+- [x] `.env.example` lists `DATABASE_URL` and every other variable the code reads; no secret is in the repository.
 
 ## Suggested skills
 
