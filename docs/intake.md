@@ -165,11 +165,11 @@ Set `features.auth` at the top. If it is `false`, skip this section. If `true`, 
 
 ### 6.3 Who can do what? A short list: the role, then the things that role can do.
 
->
+> Student: work through the lessons, save and recover a session, start over, upload a certificate, take the test. Admin: view results and progress per student, export them, and change other users' roles. The two areas are exclusive; the admin uses a separate student account to walk the lessons. (Answered in Task 02.)
 
 ### 6.4 Can visitors who are not signed in see anything? What?
 
->
+> Only the home page, sign-in, sign-up, and the two pages those link to (check your email, forbidden). Everything else needs a sign-in. (Answered in Task 02.)
 
 ### 6.5 Is there an admin who manages other users? yes / no
 
@@ -181,7 +181,7 @@ Set `features.auth` at the top. If it is `false`, skip this section. If `true`, 
 
 _Think payments, email, file storage, maps, analytics, AI, calendars. Each one becomes a setup step._
 
->
+> Magic-link email: SMTP through Auth.js's Nodemailer provider. Mailpit catches it in development (docker-compose.override.yml); production uses any SMTP service, Resend's suggested. Variables: EMAIL_SERVER and EMAIL_FROM. (Answered in Task 02.)
 
 ### 7.2 Anything it must import from or export to? Files, other systems, formats.
 
