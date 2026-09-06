@@ -6,14 +6,19 @@ import { PLACEHOLDER_STUDENT_KEY } from "@/lib/placeholder-student";
 import { prisma } from "@/lib/prisma";
 import { QUESTIONS, type Question } from "@/lib/questions";
 import { score, type Answer, type ScoreResult } from "@/lib/score";
+import { testPageWithMessage } from "./messages";
 
 // One form field per question, named by the question id, holding a choice id.
 // The choice must be one the question actually offers.
-const submissionSchema = z.object(
-  Object.fromEntries(
-    QUESTIONS.map((question) => [question.id, choiceSchemaFor(question)]),
-  ),
-);
+const submissionSchema = z.object(byQuestionId(choiceSchemaFor));
+
+function byQuestionId<T>(
+  valueFor: (question: Question) => T,
+): Record<string, T> {
+  return Object.fromEntries(
+    QUESTIONS.map((question) => [question.id, valueFor(question)]),
+  );
+}
 
 function choiceSchemaFor(question: Question) {
   return z
@@ -24,9 +29,7 @@ function choiceSchemaFor(question: Question) {
 }
 
 function readRawAnswers(formData: FormData): Record<string, unknown> {
-  return Object.fromEntries(
-    QUESTIONS.map((question) => [question.id, formData.get(question.id)]),
-  );
+  return byQuestionId((question) => formData.get(question.id));
 }
 
 function toAnswers(data: Record<string, string>): ReadonlyArray<Answer> {
@@ -56,13 +59,13 @@ async function recordAttempt(result: ScoreResult): Promise<string | null> {
 export async function submitTestAttempt(formData: FormData): Promise<void> {
   const parsed = submissionSchema.safeParse(readRawAnswers(formData));
   if (!parsed.success) {
-    redirect("/test?error=unanswered");
+    redirect(testPageWithMessage("unanswered"));
   }
 
   const result = score(toAnswers(parsed.data), QUESTIONS);
   const attemptId = await recordAttempt(result);
   if (attemptId === null) {
-    redirect("/test?error=not-saved");
+    redirect(testPageWithMessage("not-saved"));
   }
 
   redirect(`/test?attempt=${attemptId}`);

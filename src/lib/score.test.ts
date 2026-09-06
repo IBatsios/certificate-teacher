@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { Question } from "@/lib/questions";
-import { score } from "@/lib/score";
+import { score, type Answer } from "@/lib/score";
 
 const rootQuestion: Question = {
   id: "trust-anchor",
@@ -38,7 +38,7 @@ describe("score", () => {
 
   test("fails when no answer is given", () => {
     // Arrange
-    const answers: ReadonlyArray<{ questionId: string; choiceId: string }> = [];
+    const answers: ReadonlyArray<Answer> = [];
 
     // Act
     const result = score(answers, [rootQuestion]);

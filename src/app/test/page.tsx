@@ -2,20 +2,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { QUESTIONS, type Question } from "@/lib/questions";
 import { submitTestAttempt } from "./actions";
+import { TEST_MESSAGES, isTestMessageKey } from "./messages";
 
-type SearchParams = Promise<Record<string, string | string[] | undefined>>;
-
-const MESSAGES: Readonly<Record<string, string>> = {
-  unanswered: "Choose an answer before checking it.",
-  "not-saved": "Your answer could not be saved. Wait a moment and try again.",
-  "not-found": "We could not find that attempt. Take the test again.",
-};
-
-export default async function TestPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function TestPage({ searchParams }: PageProps<"/test">) {
   const params = await searchParams;
   const attemptId = firstValue(params.attempt);
 
@@ -26,15 +15,16 @@ export default async function TestPage({
     if (attempt !== null) {
       return <ResultView passed={attempt.passed} takenAt={attempt.createdAt} />;
     }
-    return <QuestionForm message={MESSAGES["not-found"]} />;
+    return <QuestionForm message={TEST_MESSAGES["not-found"]} />;
   }
 
   const errorKey = firstValue(params.error);
-  return (
-    <QuestionForm
-      message={errorKey === undefined ? undefined : MESSAGES[errorKey]}
-    />
-  );
+  const message =
+    errorKey !== undefined && isTestMessageKey(errorKey)
+      ? TEST_MESSAGES[errorKey]
+      : undefined;
+
+  return <QuestionForm message={message} />;
 }
 
 function firstValue(value: string | string[] | undefined): string | undefined {
