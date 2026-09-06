@@ -25,7 +25,7 @@
 ## What to do next, in order
 
 1. `git push -u origin feature/walking-skeleton`, open the pull request to `main`, and wait for CI. Tick the last box in `docs/tasks/01-walking-skeleton.md` when it is green.
-2. Merge, then start Task 02 from `main` on `feature/sign-in`: Auth.js with the Prisma adapter, `User` with a `student` or `admin` role, and `TestAttempt.userId` in place of `studentKey`. Note that Next 16 renamed `middleware.ts` to `proxy.ts`; read `node_modules/next/dist/docs/01-app/01-getting-started/16-proxy.md` first.
+2. Merge, then start Task 02 from `main` on `feature/sign-in`: Auth.js with the Prisma adapter, `User` with a `student` or `admin` role, and `TestAttempt.userId` in place of `studentKey`. Note that Next 16 renamed `middleware.ts` to `proxy.ts`; read `node_modules/next/dist/docs/01-app/01-getting-started/16-proxy.md` first. Two things the review flagged for Task 02: the `/test?attempt=<id>` lookup in `src/app/test/page.tsx` currently shows any attempt by id, so scope it to the signed-in user; and the server action logs with `console.error`, fine for now, but pick a logger when there is more than one place to log from.
 3. When a phase ends, write the next handoff doc here, in this shape.
 
 ## Suggested skills for the next session
