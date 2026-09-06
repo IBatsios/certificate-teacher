@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02.
 
-**Status:** built on `feature/certificates-lesson` on 2026-09-06; waiting on the pull request and a green CI run. See `docs/handoff-items/handoff-after-task-03.md`.
+**Status:** built on `feature/certificates-lesson` on 2026-09-06; pull request #3 open with CI green, waiting on the merge. See `docs/handoff-items/handoff-after-task-03.md`.
 
 ## Steps, a vertical slice in this order
 
@@ -23,7 +23,7 @@
 - [x] The end-to-end test passes. (Tick, sign out and in, still ticked; start over lists the old session; a tick can be undone.)
 - [x] Start over archives the old session; nothing is deleted. (D33; tested in Vitest and Playwright.)
 - [x] The migration is committed under `prisma/migrations/`. (`20260906202507_learning_session`.)
-- [ ] Every earlier test still passes; CI is green. (All pass locally, 45 unit and 11 browser tests; CI needs the push and the pull request.)
+- [x] Every earlier test still passes; CI is green. (46 unit and 11 browser tests; both CI jobs green on pull request #3.)
 - [x] Any new environment variable is in `.env.example` with a placeholder. (None were needed.)
 
 ## Suggested skills
