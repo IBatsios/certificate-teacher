@@ -39,7 +39,11 @@ function QuestionForm({ message }: { message?: string }) {
       <h1 className="text-2xl font-semibold">Test: certificate chains</h1>
       <p>
         One question for now. Later the test covers every lesson and tells you
-        which topics to revisit.
+        which topics to revisit. Not ready?{" "}
+        <Link href="/lessons/certificates" className="underline">
+          Back to the lesson
+        </Link>
+        .
       </p>
       {message !== undefined && (
         <p

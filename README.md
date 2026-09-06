@@ -23,17 +23,18 @@ After changing `prisma/schema.prisma`: `pnpm prisma migrate dev --name <what-cha
 ## Test
 
 ```
-pnpm test          # unit tests, Vitest, no database needed
+pnpm test          # Vitest: pure functions, plus the session functions against the compose database
 pnpm lint
 pnpm typecheck
 pnpm test:e2e      # browser tests, Playwright; needs the compose services running
 ```
 
-`pnpm test:watch` keeps Vitest running while you work. The browser tests start their own copy of the app on port 3100, sign up throwaway accounts ending in `@e2e.test`, read magic links from Mailpit, and delete those accounts when they finish. First time only: `pnpm playwright install chromium`.
+`pnpm test:watch` keeps Vitest running while you work. The session tests create accounts ending in `@unit.test` and remove them afterwards. The browser tests start their own copy of the app on port 3100, sign up throwaway accounts ending in `@e2e.test`, read magic links from Mailpit, and delete those accounts when they finish. First time only: `pnpm playwright install chromium`.
 
 ## Where things are
 
 - `docs/PRD.md`: what and why. `docs/ARCHITECTURE.md`: how. `docs/DECISIONS.md`: what was decided and why.
 - `docs/RUNBOOK.md`: what to do next. `docs/tasks/`: one file per task.
 - `src/app/`: pages and server actions. `src/lib/`: pure functions and data access. `prisma/`: schema and migrations. `e2e/`: browser tests.
+- `content/lessons/`: the lesson text, one markdown file per step. Edit the text there; the page renders it. A step's `key` is stored with students' progress, so never change one.
 - `src/auth.ts` and `src/auth.config.ts`: Auth.js. `src/proxy.ts`: the route guard, driven by the role matrix in `src/lib/access.ts`.

@@ -11,7 +11,7 @@ export const FORBIDDEN_PATH = "/forbidden";
 
 /** Where each role lands after signing in. */
 export const HOME_BY_ROLE: Readonly<Record<Role, string>> = {
-  student: "/test",
+  student: "/lessons/certificates",
   admin: "/admin/users",
 };
 
@@ -34,6 +34,7 @@ const SIGNED_OUT_ONLY_PATHS: ReadonlySet<string> = new Set([
 // The role matrix from docs/PRD.md: each area of the app belongs to one role.
 // A path that starts with the prefix (as a whole segment) is in the area.
 const ROLE_AREAS: ReadonlyArray<Readonly<{ prefix: string; role: Role }>> = [
+  { prefix: "/lessons", role: "student" },
   { prefix: "/test", role: "student" },
   { prefix: "/admin", role: "admin" },
 ];

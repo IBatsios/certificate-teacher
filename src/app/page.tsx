@@ -34,7 +34,7 @@ export default async function Home() {
           href={HOME_BY_ROLE[user.role]}
           className="self-start rounded bg-black px-4 py-2 text-white"
         >
-          {user.role === "admin" ? "See your students" : "Take the test"}
+          {user.role === "admin" ? "See your students" : "Go to the lesson"}
         </Link>
       )}
     </main>

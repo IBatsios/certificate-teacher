@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02.
 
-**Status:** ready
+**Status:** built on `feature/certificates-lesson` on 2026-09-06; pull request #3 open with CI green, waiting on the merge. See `docs/handoff-items/handoff-after-task-03.md`.
 
 ## Steps, a vertical slice in this order
 
@@ -18,13 +18,13 @@
 
 ## Acceptance criteria
 
-- [ ] As a student, I can generate my own certificates and save my progress: demonstrated end to end.
-- [ ] Vitest covers the data-access functions as a caller would observe them, and passes.
-- [ ] The end-to-end test passes.
-- [ ] Start over archives the old session; nothing is deleted.
-- [ ] The migration is committed under `prisma/migrations/`.
-- [ ] Every earlier test still passes; CI is green.
-- [ ] Any new environment variable is in `.env.example` with a placeholder.
+- [x] As a student, I can generate my own certificates and save my progress: demonstrated end to end. (Walked on 2026-09-06 with the commands run on OpenSSL 3.5; `e2e/generate-a-certificate.spec.ts`.)
+- [x] Vitest covers the data-access functions as a caller would observe them, and passes. (`src/lib/learning-session.test.ts`, against the compose database; D36.)
+- [x] The end-to-end test passes. (Tick, sign out and in, still ticked; start over lists the old session; a tick can be undone.)
+- [x] Start over archives the old session; nothing is deleted. (D33; tested in Vitest and Playwright.)
+- [x] The migration is committed under `prisma/migrations/`. (`20260906202507_learning_session`.)
+- [x] Every earlier test still passes; CI is green. (46 unit and 11 browser tests; both CI jobs green on pull request #3.)
+- [x] Any new environment variable is in `.env.example` with a placeholder. (None were needed.)
 
 ## Suggested skills
 

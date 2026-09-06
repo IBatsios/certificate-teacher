@@ -14,7 +14,7 @@ test("a new student signs up with a password, signs out, and signs back in", asy
   const email = uniqueEmail("student");
 
   await signUpWithPassword(page, email);
-  await expect(page).toHaveURL(/\/test$/);
+  await expect(page).toHaveURL(/\/lessons\/certificates$/);
   await expect(
     accountNav(page).getByRole("link", { name: email }),
   ).toBeVisible();
@@ -24,7 +24,7 @@ test("a new student signs up with a password, signs out, and signs back in", asy
   await expect(page).toHaveURL(/\/sign-in$/);
 
   await signInWithPassword(page, email);
-  await expect(page).toHaveURL(/\/test$/);
+  await expect(page).toHaveURL(/\/lessons\/certificates$/);
   await expect(
     accountNav(page).getByRole("link", { name: email }),
   ).toBeVisible();
