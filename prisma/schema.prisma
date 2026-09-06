@@ -10,11 +10,77 @@ datasource db {
   provider = "postgresql"
 }
 
-// One submission of the test. studentKey is the placeholder identity from
-// src/lib/placeholder-student.ts until Task 02 replaces it with a User.
+// Who a signed-in person is: a student works through the lessons and takes the
+// test; the admin sees everyone's progress and manages roles.
+enum Role {
+  student
+  admin
+}
+
+// A person who has signed up. The Auth.js fields (name, emailVerified, image)
+// are kept as the adapter expects them. passwordHash is set only for people
+// who chose email and password; magic-link users never have one.
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String        @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role          @default(student)
+  passwordHash  String?
+  createdAt     DateTime      @default(now())
+  accounts      Account[]
+  sessions      Session[]
+  testAttempts  TestAttempt[]
+}
+
+// Auth.js: a sign-in method linked to a user. Unused until an OAuth provider
+// is added, but the adapter expects the model.
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// Auth.js: database sessions. Sessions are JSON web tokens in this app (see
+// docs/DECISIONS.md), so this table stays empty; it is here so the adapter's
+// full contract is satisfied and switching strategies later needs no migration.
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Auth.js: the one-time token behind a magic link.
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// One submission of the test by a signed-in student.
 model TestAttempt {
-  id         String   @id @default(cuid())
-  studentKey String
-  passed     Boolean
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passed    Boolean
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

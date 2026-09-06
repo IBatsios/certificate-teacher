@@ -44,3 +44,7 @@ Thumbs.db
 *.pem
 .idea/
 .vscode/
+
+# playwright
+playwright-report/
+test-results/
