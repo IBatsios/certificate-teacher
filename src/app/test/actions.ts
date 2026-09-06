@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { PLACEHOLDER_STUDENT_KEY } from "@/lib/placeholder-student";
+import { requireRole } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { QUESTIONS, type Question } from "@/lib/questions";
 import { score, type Answer, type ScoreResult } from "@/lib/score";
@@ -39,10 +39,13 @@ function toAnswers(data: Record<string, string>): ReadonlyArray<Answer> {
   }));
 }
 
-async function recordAttempt(result: ScoreResult): Promise<string | null> {
+async function recordAttempt(
+  userId: string,
+  result: ScoreResult,
+): Promise<string | null> {
   try {
     const attempt = await prisma.testAttempt.create({
-      data: { studentKey: PLACEHOLDER_STUDENT_KEY, passed: result.passed },
+      data: { userId, passed: result.passed },
       select: { id: true },
     });
     return attempt.id;
@@ -57,13 +60,15 @@ async function recordAttempt(result: ScoreResult): Promise<string | null> {
  * the result. Redirects happen outside try/catch because `redirect` throws.
  */
 export async function submitTestAttempt(formData: FormData): Promise<void> {
+  const student = await requireRole("student");
+
   const parsed = submissionSchema.safeParse(readRawAnswers(formData));
   if (!parsed.success) {
     redirect(testPageWithMessage("unanswered"));
   }
 
   const result = score(toAnswers(parsed.data), QUESTIONS);
-  const attemptId = await recordAttempt(result);
+  const attemptId = await recordAttempt(student.id, result);
   if (attemptId === null) {
     redirect(testPageWithMessage("not-saved"));
   }

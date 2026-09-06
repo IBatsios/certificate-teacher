@@ -6,7 +6,7 @@
 
 **Blocked by:** 01.
 
-**Status:** ready
+**Status:** built on `feature/sign-in` on 2026-09-06; pull request #2 open with CI green, waiting on the merge. See `docs/handoff-items/handoff-after-task-02.md`.
 
 ## Steps, in order
 
@@ -20,12 +20,12 @@
 
 ## Acceptance criteria
 
-- [ ] Sign-in works with every method in email and password, magic link, and sign-out ends the session.
-- [ ] A new user can sign up and sign back in.
-- [ ] Every row of the role matrix is enforced and has a test.
-- [ ] `AUTH_SECRET` and every provider credential are in `.env` only, with placeholders in `.env.example`.
-- [ ] The auth migration is committed under `prisma/migrations/`.
-- [ ] Earlier tests still pass; CI is green.
+- [x] Sign-in works with every method in email and password, magic link, and sign-out ends the session. (Playwright: `e2e/password-sign-in.spec.ts`, `e2e/magic-link.spec.ts`.)
+- [x] A new user can sign up and sign back in. (Both methods; a first magic link creates the account.)
+- [x] Every row of the role matrix is enforced and has a test. (`src/lib/access.test.ts` for the matrix, `e2e/roles.spec.ts` for the pages, `src/lib/role-change.test.ts` for role changes.)
+- [x] `AUTH_SECRET` and every provider credential are in `.env` only, with placeholders in `.env.example`. (`EMAIL_SERVER`, `EMAIL_FROM`, `ADMIN_EMAIL` replace `AUTH_RESEND_KEY`; see D18.)
+- [x] The auth migration is committed under `prisma/migrations/`. (`20260906184654_auth`; it deletes the placeholder attempts first.)
+- [x] Earlier tests still pass; CI is green. (28 unit and 9 browser tests; both CI jobs green on pull request #2.)
 
 ## Suggested skills
 

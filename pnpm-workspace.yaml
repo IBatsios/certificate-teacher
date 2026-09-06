@@ -3,4 +3,5 @@ ignoredBuiltDependencies:
   - unrs-resolver
 onlyBuiltDependencies:
   - "@prisma/engines"
+  - argon2
   - prisma

@@ -6,7 +6,7 @@
 
 **Blocked by:** None. Phase 0 of the runbook must be complete first: database reachable, `.env` filled.
 
-**Status:** built on `feature/walking-skeleton` on 2026-09-06; waiting on the pull request and a green CI run. See `docs/handoff-items/handoff-after-task-01.md`.
+**Status:** done. Merged to `main` through pull request #1 on 2026-09-06 with CI green. See `docs/handoff-items/handoff-after-task-01.md`.
 
 ## Steps, in order
 

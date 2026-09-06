@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireRole } from "@/lib/session";
 import { QUESTIONS, type Question } from "@/lib/questions";
 import { submitTestAttempt } from "./actions";
 import { TEST_MESSAGES, isTestMessageKey } from "./messages";
 
 export default async function TestPage({ searchParams }: PageProps<"/test">) {
+  const student = await requireRole("student");
   const params = await searchParams;
   const attemptId = firstValue(params.attempt);
 
   if (attemptId !== undefined) {
-    const attempt = await prisma.testAttempt.findUnique({
-      where: { id: attemptId },
+    const attempt = await prisma.testAttempt.findFirst({
+      where: { id: attemptId, userId: student.id },
     });
     if (attempt !== null) {
       return <ResultView passed={attempt.passed} takenAt={attempt.createdAt} />;

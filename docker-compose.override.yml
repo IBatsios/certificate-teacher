@@ -1,0 +1,12 @@
+# Development additions to docker-compose.yml. Compose merges this file in
+# automatically. docker-compose.yml is generated from docs/intake.md and
+# overwritten on regenerate; this file is not.
+services:
+  mailpit:
+    # Catches every email the app sends in development. Read them at
+    # http://localhost:8026 (8025 belongs to another project on this machine); the
+    # app sends to localhost:1025.
+    image: axllent/mailpit:v1.29
+    ports:
+      - "1025:1025"
+      - "8026:8025"
