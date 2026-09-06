@@ -37,10 +37,10 @@
            run: pnpm test
    ```
 
-   `pnpm/action-setup@v4` reads the pnpm version from the `packageManager` field in `package.json`; add that field if `create-next-app` did not.
+   `pnpm/action-setup@v4` needs a `packageManager` field in `package.json`; add `"packageManager": "pnpm@<installed version>"` when `create-next-app` did not write it.
 6. The one page at `src/app/test/page.tsx` for the most important path: one question, a submit, and the result written as a `TestAttempt` through Prisma and shown back as pass or fail.
 7. `README.md`: install, dev, test commands. Check they match `CLAUDE.md`.
-8. Commit on this branch.
+8. Before writing code, start the branch `feature/walking-skeleton` from `main`; commit there, and open the pull request when the criteria pass.
 
 ## Acceptance criteria
 
@@ -53,6 +53,7 @@
 
 ## Suggested skills
 
+- `plan`: before step 1, to restate the task and list the risks.
 - `tdd`: write `score.test.ts` before `score.ts`.
 - `setup-pre-commit`: once the app exists, add the pre-commit hooks for formatting, type checking, and tests.
 - `build-fix`: when `create-next-app` or the first build fails.

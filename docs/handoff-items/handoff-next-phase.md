@@ -2,14 +2,15 @@
 
 # Handoff — after kickoff
 
-**Date:** 2026-09-05
+**Date:** 2026-09-06
 **Phase finished:** kickoff: intake, planning documents, and the task list
 **Next phase:** Phase 0 of the runbook, then Task 01
 
 ## Where things stand
 
 - `docs/intake.md` is the source. `docs/PRD.md`, `docs/ARCHITECTURE.md`, and `docs/DECISIONS.md` were generated from it.
-- `docs/RUNBOOK.md` says what to do next. Phase 0 needs a person: create the GitHub repository, start the compose database, fill `.env`, scan for secrets, run `/project-init`, push and open the first pull request.
+- This was a regenerate: the intake did not change, the kickoff templates did. The result is committed on `feature/kickoff-regenerate`, and step 0.6 of the runbook merges it to `main` through a pull request.
+- `docs/RUNBOOK.md` says what to do next. Phase 0 needs a person: create the GitHub repository, start the compose database, fill `.env`, scan for secrets, run `/project-init`, push `main` and the regenerate branch, protect `main`.
 - 9 tasks are in `docs/tasks/`. None has started.
 - No code exists yet. Task 01 writes the first line.
 

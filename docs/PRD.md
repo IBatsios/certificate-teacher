@@ -6,7 +6,7 @@ Teacher is an app that teaches users how certificate chains work, how to get htt
 
 ## Problem
 
-Reading about security is too hard for me; it is easier when I can see it applied.
+Reading about security is too hard; it is easier to see it applied.
 
 **Today:** Our work staff needs guidance.
 
@@ -14,19 +14,19 @@ Reading about security is too hard for me; it is easier when I can see it applie
 
 | User | Wants | Role |
 |---|---|---|
-| Anyone who wants to learn | To learn certificate chains, https in the browser, Java keystores, and reverse proxies by applying them | student |
-| The person guiding the staff | To see results and progress per student | admin |
+| Anyone that wants to learn | To learn how certificate chains work, how to get https in the browser, why and how to import certificates into a Java keystore, and how to set up a reverse proxy, by applying each one | student |
+| The person guiding the staff | To view results and progress per student (inferred from 6.5) | admin |
 
-Scale: unknown. Technical comfort: assume all three levels will use it, so develop for no experience (not at all).
+Scale: unknown. Technical comfort: assume all three will use it, so develop for no experience (not at all).
 
 ## User stories
 
 ### Must have for v1
 
 1. As a student, I can generate my own certificates, deploy them, and test using a reverse proxy and with Java, so that I learn how certificate chains work by applying them (inferred).
-2. As a student, I can upload my self-signed certificate for review and verification, so that the app confirms I applied the lesson correctly. (inferred from 7.2 and 14.1)
-3. As a student, I can take a test phase and see a pass or fail with focus areas recorded, so that my knowledge is confirmed. (inferred from 4.4 and 14.1)
-4. As a student, I can save my session, come back to it later, or start over without losing the old one, so that I never lose progress. (inferred from 5.1, 5.3, and 14.1)
+2. As a student, I can save my session, come back to it later, or start over without losing the old one, so that I never lose progress. (inferred from 5.1, 5.3, and 14.1)
+3. As a student, I can upload my self-signed certificate for review and verification, so that the app confirms I applied the lesson correctly. (inferred from 7.2 and 14.1)
+4. As a student, I can take a test phase and see a pass or fail with focus areas recorded, so that my knowledge is confirmed. (inferred from 4.4 and 14.1)
 5. As an admin, I can view results and progress per student and export results with focus areas, so that I know where staff need guidance. (inferred from 6.5, 7.2, and 14.1)
 
 ## The most important path
@@ -58,10 +58,10 @@ Imports and exports: Export results with focus areas. Might need to be able to i
 
 - Load and speed: a handful of staff at once; pages feel instant; the only heavy server work is parsing an uploaded certificate.
 - Accessibility: best effort.
-- Devices and browsers: current Chrome, Edge, and Firefox on desktop; phone is nice-to-have.
+- Devices and browsers: current Chrome, Edge, and Firefox on desktop, since students run Java and a reverse proxy on a desktop anyway; phone is nice-to-have.
 - Offline: no.
 - Languages: English only.
-- Security and compliance: none known; personal details are stored, so passwords are hashed and traffic is over HTTPS.
+- Security and compliance: none known; personal details are stored, so hashed passwords and HTTPS are the baseline.
 - Uptime: business hours.
 
 ## Constraints
@@ -70,7 +70,7 @@ Imports and exports: Export results with focus areas. Might need to be able to i
 - Budget: some.
 - Team: Ioannis Batsios, developer and content author.
 - Existing assets: the domain ioannisbatsios.com; nothing else.
-- Must use or avoid: none beyond 8.11 (Auth.js for sign-in; `@peculiar/x509` for parsing uploaded certificates).
+- Must use or avoid: none beyond 8.11 (Auth.js for email-and-password plus magic link; `@peculiar/x509` for parsing the certificates students upload).
 
 ## Out of scope
 
@@ -102,4 +102,4 @@ Imports and exports: Export results with focus areas. Might need to be able to i
 - 3.3 How many users at launch, and a year later?
 - 6.3 Who can do what, per role?
 - 6.4 What can visitors who are not signed in see?
-- 7.1 External services: magic-link sign-in needs an email sender, and none was chosen.
+- 7.1 External services. Magic-link sign-in needs an email sender, and none was chosen.

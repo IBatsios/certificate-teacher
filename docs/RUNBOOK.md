@@ -74,13 +74,19 @@ No output means nothing matched. A match in `.env.example` with a placeholder va
 
 Run `/project-init` in this directory and accept the plan it proposes.
 
-### 0.6 Push and open the first pull request
+### 0.6 Push
 
 ```
-git push -u origin feature/initial-scaffold
+git push -u origin main
 ```
 
-Then open a pull request on GitHub from `feature/initial-scaffold` to the default branch.
+This build was a regenerate, committed on `feature/kickoff-regenerate` rather than `main`. Push it too, and merge it to `main` through a pull request before Task 01 starts:
+
+```
+git push -u origin feature/kickoff-regenerate
+```
+
+Task 01 opens the next pull request, from `feature/walking-skeleton` to `main`. Protect `main` in the repository settings on GitHub now that it exists.
 
 ### 0.7 Before every migration from now on
 
@@ -90,11 +96,11 @@ There is no staging environment. Back up the database before each migration. In 
 docker compose exec -T db pg_dump -U teacher teacher > "backup-$(Get-Date -Format yyyy-MM-dd).sql"
 ```
 
-In production, take a backup of the PostgreSQL service in the Railway dashboard before merging a migration to the default branch.
+In production, take a backup of the PostgreSQL service in the Railway dashboard before merging a migration to `main`.
 
 ## Phase 1 — build
 
-Pick the next task from the **frontier**: any task whose "Blocked by" list is entirely done. Finish it to its acceptance criteria before starting another. Each task lives in `docs/tasks/`.
+Pick the next task from the **frontier**: any task whose "Blocked by" list is entirely done. Finish it to its acceptance criteria before starting another. Each task lives in `docs/tasks/`. Every task starts on its own branch from `main` and ends in a pull request.
 
 | # | Task | Blocked by | Delivers |
 |---|---|---|---|
