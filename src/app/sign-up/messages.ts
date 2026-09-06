@@ -8,6 +8,8 @@ export const SIGN_UP_MESSAGES = {
     "That address belongs to the admin. Go to sign in and ask for a link by email instead; opening it creates the admin account.",
   "already-registered":
     "That email already has an account. Sign in instead, or ask for a sign-in link.",
+  "too-many-attempts":
+    "Too many accounts created from here in a short time. Wait fifteen minutes and try again.",
   "not-saved":
     "Your account could not be created. Wait a moment and try again.",
 } as const;

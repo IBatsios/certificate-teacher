@@ -43,7 +43,7 @@ git:                       # (developer) Section 9
 
 deployment:                # (developer) Section 10
   target: "Railway"        # Vercel | Netlify | Cloudflare | Fly.io | Railway | Docker on a server I control | desktop packaging | local only | other
-  domain: "ioannisbatsios.com"
+  domain: "teacher.ioannisbatsios.com"   # the apex serves the personal website; Teacher lives on a subdomain (D40)
   environments: [development, production]   # development | staging | production
 
 conventions:               # (developer) Section 9. Asked in the walkthrough. Blank means "use kickoff's default, or my saved default".
@@ -285,7 +285,7 @@ _Platform environment variables, a vault, a file on the server._
 > A student can take the test phase, and a pass or fail with focus areas is recorded.
 > A student can start over without losing the option to recover the old session.
 > The admin can see every student's progress and results and export them.
-> It is live at ioannisbatsios.com over HTTPS.
+> It is live at teacher.ioannisbatsios.com over HTTPS. (The apex serves the personal website; changed in Task 08.)
 
 ### 14.2 A month after launch, how will you know it worked?
 

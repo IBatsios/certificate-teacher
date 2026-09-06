@@ -6,6 +6,7 @@ import { z } from "zod";
 import { signIn } from "@/auth";
 import { HOME_BY_ROLE, SIGN_IN_PATH } from "@/lib/access";
 import { normalizeEmail } from "@/lib/roles";
+import { allowPasswordAttempt, allowSignInLink } from "@/lib/sign-in-limits";
 import { findUserByEmail } from "@/lib/users";
 import { signInPageWithMessage } from "./messages";
 
@@ -33,6 +34,9 @@ export async function signInWithPassword(formData: FormData): Promise<void> {
   }
 
   const email = normalizeEmail(parsed.data.email);
+  if (!(await allowPasswordAttempt(email))) {
+    redirect(signInPageWithMessage("too-many-attempts"));
+  }
   const signedIn = await trySignInWithPassword(email, parsed.data.password);
   if (!signedIn) {
     redirect(signInPageWithMessage("wrong-password"));
@@ -68,7 +72,11 @@ export async function sendSignInLink(formData: FormData): Promise<void> {
     redirect(signInPageWithMessage("missing-email"));
   }
 
-  const sent = await trySendSignInLink(normalizeEmail(parsed.data.email));
+  const email = normalizeEmail(parsed.data.email);
+  if (!(await allowSignInLink(email))) {
+    redirect(signInPageWithMessage("too-many-attempts"));
+  }
+  const sent = await trySendSignInLink(email);
   if (!sent) {
     redirect(signInPageWithMessage("link-not-sent"));
   }

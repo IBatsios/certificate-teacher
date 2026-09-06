@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import {
   accountNav,
   pageMessage,
@@ -50,4 +50,19 @@ test("signing up twice with the same email is refused", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/sign-up\?error=already-registered$/);
   await expect(pageMessage(page)).toContainText("already has an account");
+});
+
+test("too many wrong passwords are refused for a while", async ({ page }) => {
+  const email = uniqueEmail("student");
+  await signUpWithPassword(page, email);
+  await signOut(page);
+
+  for (let attempt = 1; attempt <= 10; attempt += 1) {
+    await signInWithPassword(page, email, "not the password");
+    await expect(page).toHaveURL(/\/sign-in\?error=wrong-password$/);
+  }
+  await signInWithPassword(page, email, "not the password");
+
+  await expect(page).toHaveURL(/\/sign-in\?error=too-many-attempts$/);
+  await expect(pageMessage(page)).toContainText("Wait fifteen minutes");
 });
