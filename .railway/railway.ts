@@ -31,6 +31,10 @@ export default defineRailway(() => {
     deploy: { restartPolicyMaxRetries: 5 },
     domains: ["teacher.ioannisbatsios.com"],
     env: {
+      // Set in Railway since the first deploy. It must stay listed here:
+      // a variable this file omits is one `railway config apply` deletes, and
+      // losing it would silently make the next admin a student (D19, D66).
+      ADMIN_EMAIL: preserve(),
       AUTH_RESEND_KEY: preserve(),
       AUTH_SECRET: preserve(),
       AUTH_TRUST_HOST: preserve(),
