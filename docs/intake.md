@@ -113,7 +113,7 @@ _For example: admin, member, visitor._
 
 ### 3.4 How technical are they? Choose one: not at all / comfortable with apps / developers.
 
-> Assume all three will use it, so develop for no experience (not at all).
+> Assume all three will use it, so develop for no experience (not at all). They still have to install tools on their own machine to follow the lessons, so every install and every command is written out for each system and nothing is assumed to already be there.
 
 ## Section 4 — Core features (required)
 
@@ -259,14 +259,14 @@ _Platform environment variables, a vault, a file on the server._
 
 ### 12.5 Must-use or must-avoid technology, vendors, or licenses.
 
-> None beyond 8.11.
+> None beyond 8.11. On the student's own machine the lessons need OpenSSL, Docker Desktop, and a JDK. The deploy lesson teaches nginx run through Docker Compose rather than a native install, so one set of commands works on Windows, Mac, and Linux (D51).
 
 ## Section 13 — Out of scope (optional, strongly encouraged)
 
 ### 13.1 Things this will explicitly not do in v1.
 
 > No course authoring UI: lessons are written in code or markdown by the developer.
-> No running Java or a reverse proxy inside the app: students do that on their own machine.
+> No running Java or a reverse proxy inside the app: students do that on their own machine, with OpenSSL, Docker Desktop, and a JDK that they install themselves.
 > No certificate authority service: the app does not issue real certificates.
 > No mobile layout.
 
