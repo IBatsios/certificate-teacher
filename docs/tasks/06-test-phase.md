@@ -51,7 +51,12 @@ The interface stayed a server action rather than the
 D56. The page was already an action, so this is no change rather than a
 deviation.
 
-Not verified: the questions themselves. Sixteen questions across four topics
-are written and every one is answerable from the lessons, but whether the
-distractors are fair, and whether a real student reads them the way they were
-meant, is a judgement no test makes.
+Found in review: the correct answer was the first choice in all sixteen
+questions, so a student who read nothing and clicked down the first column
+scored sixteen of sixteen and passed. The page now shuffles the choices on
+every render, the file on disk is no longer ordered by answer, and an
+end-to-end test fails if the order ever stops changing (D61).
+
+Still not verified: the questions themselves. Every one is answerable from the
+lessons, but whether the distractors are fair, and whether a real student reads
+them the way they were meant, is a judgement no test makes.

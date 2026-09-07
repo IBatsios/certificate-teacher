@@ -122,3 +122,43 @@ function assertDistinct(ids: ReadonlyArray<string>, what: string): void {
     seen.add(id);
   }
 }
+
+/**
+ * The same questions with each question's choices in a fresh order.
+ *
+ * Called on every render, so the position of the right answer tells a student
+ * nothing. Without it a test can be passed by clicking the first option every
+ * time, which is not a measure of anything; the first version of this bank had
+ * exactly that flaw. Answers are recorded by choice id, never by position, so
+ * shuffling changes nothing about how a submission is scored.
+ *
+ * Returns new objects: the bank is read once and shared between requests, and
+ * rewriting it in place would reorder it for everyone.
+ */
+export function withShuffledChoices(
+  questions: ReadonlyArray<Question>,
+  random: () => number = Math.random,
+): ReadonlyArray<Question> {
+  return questions.map((question) => ({
+    ...question,
+    choices: shuffled(question.choices, random),
+  }));
+}
+
+/** Fisher-Yates, on a copy. */
+function shuffled<T>(
+  items: ReadonlyArray<T>,
+  random: () => number,
+): ReadonlyArray<T> {
+  const copy = [...items];
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(random() * (index + 1));
+    const here = copy[index];
+    const there = copy[swap];
+    if (here !== undefined && there !== undefined) {
+      copy[index] = there;
+      copy[swap] = here;
+    }
+  }
+  return copy;
+}

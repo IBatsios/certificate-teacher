@@ -5,6 +5,7 @@ import { loadLesson } from "@/lib/lesson";
 import { startOrResume } from "@/lib/learning-session";
 import {
   loadQuestionBank,
+  withShuffledChoices,
   type Question,
   type QuestionBank,
   type Topic,
@@ -77,6 +78,8 @@ function QuestionForm({
   unfinished?: ReadonlyArray<string>;
 }) {
   const perTopic = bank.questions.length / bank.topics.length;
+  // Fresh order on every render, so clicking down one column proves nothing.
+  const asked = withShuffledChoices(bank.questions);
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-10 px-8 py-10">
       <header className="flex flex-col gap-4">
@@ -131,9 +134,7 @@ function QuestionForm({
           <TopicSection
             key={topic.id}
             topic={topic}
-            questions={bank.questions.filter(
-              (question) => question.topic === topic.id,
-            )}
+            questions={asked.filter((question) => question.topic === topic.id)}
           />
         ))}
         <button

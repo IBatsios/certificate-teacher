@@ -3,6 +3,7 @@ import {
   loadQuestionBank,
   parseQuestionBank,
   QUESTIONS_PER_TOPIC_MINIMUM,
+  withShuffledChoices,
 } from "@/lib/questions";
 
 /** A bank small enough to read, valid in every way the parser cares about. */
@@ -118,5 +119,87 @@ describe("the question bank on disk", () => {
     for (const topic of bank.topics) {
       expect(asked.has(topic.id), topic.id).toBe(true);
     }
+  });
+});
+
+describe("withShuffledChoices", () => {
+  /** A random() that walks a fixed list, so a shuffle is reproducible. */
+  function sequence(values: ReadonlyArray<number>): () => number {
+    let index = 0;
+    return () => values[index++ % values.length] ?? 0;
+  }
+
+  const question = {
+    id: "one",
+    topic: "chains",
+    prompt: "A question?",
+    choices: [
+      { id: "a", label: "First" },
+      { id: "b", label: "Second" },
+      { id: "c", label: "Third" },
+    ],
+    correctChoiceId: "a",
+  };
+
+  test("offers exactly the same choices, in some order", () => {
+    // Act
+    const [shuffled] = withShuffledChoices([question], sequence([0.9, 0.1]));
+
+    // Assert
+    expect(shuffled?.choices.map((choice) => choice.id).sort()).toEqual([
+      "a",
+      "b",
+      "c",
+    ]);
+    expect(shuffled?.correctChoiceId).toBe("a");
+  });
+
+  test("different randomness puts them in a different order", () => {
+    const [one] = withShuffledChoices([question], sequence([0, 0]));
+    const [two] = withShuffledChoices([question], sequence([0.99, 0.99]));
+
+    expect(one?.choices.map((choice) => choice.id)).not.toEqual(
+      two?.choices.map((choice) => choice.id),
+    );
+  });
+
+  test("leaves the question it was given untouched", () => {
+    // Arrange: the bank is loaded once and shared, so shuffling must not
+    // rewrite it for the next request.
+    const before = question.choices.map((choice) => choice.id);
+
+    withShuffledChoices([question], sequence([0.5, 0.5]));
+
+    expect(question.choices.map((choice) => choice.id)).toEqual(before);
+  });
+
+  test("every choice survives, over many shuffles", () => {
+    for (let run = 0; run < 200; run += 1) {
+      const [shuffled] = withShuffledChoices([question]);
+      expect(shuffled?.choices).toHaveLength(3);
+      expect(new Set(shuffled?.choices.map((choice) => choice.id)).size).toBe(
+        3,
+      );
+    }
+  });
+});
+
+describe("the bank on disk does not give the answer away by position", () => {
+  /**
+   * The page shuffles on every render, so this is not what protects the test.
+   * It is here because the first version of the bank had the correct answer
+   * first in all sixteen questions, and clicking the first option every time
+   * scored full marks.
+   */
+  test("the correct answers are not all in one position", async () => {
+    const bank = await loadQuestionBank();
+
+    const positions = bank.questions.map((question) =>
+      question.choices.findIndex(
+        (choice) => choice.id === question.correctChoiceId,
+      ),
+    );
+
+    expect(new Set(positions).size).toBeGreaterThan(1);
   });
 });

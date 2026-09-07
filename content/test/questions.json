@@ -1,9 +1,21 @@
 {
   "topics": [
-    { "id": "chains", "title": "Certificate chains" },
-    { "id": "browser", "title": "https in the browser" },
-    { "id": "proxy", "title": "The reverse proxy" },
-    { "id": "java", "title": "The Java keystore" }
+    {
+      "id": "chains",
+      "title": "Certificate chains"
+    },
+    {
+      "id": "browser",
+      "title": "https in the browser"
+    },
+    {
+      "id": "proxy",
+      "title": "The reverse proxy"
+    },
+    {
+      "id": "java",
+      "title": "The Java keystore"
+    }
   ],
   "questions": [
     {
@@ -16,12 +28,12 @@
           "label": "The root certificate, because it is already installed on the computer"
         },
         {
-          "id": "intermediate",
-          "label": "The intermediate certificate, because it signs the others"
-        },
-        {
           "id": "leaf",
           "label": "The website's own certificate, because it names the site"
+        },
+        {
+          "id": "intermediate",
+          "label": "The intermediate certificate, because it signs the others"
         }
       ],
       "correctChoiceId": "root"
@@ -36,12 +48,12 @@
           "label": "Its subject and its issuer are the same, and its own key signed it"
         },
         {
-          "id": "name",
-          "label": "It has the word Root in its name"
-        },
-        {
           "id": "long",
           "label": "It is valid for far longer than an ordinary certificate"
+        },
+        {
+          "id": "name",
+          "label": "It has the word Root in its name"
         }
       ],
       "correctChoiceId": "self-signed"
@@ -52,12 +64,12 @@
       "prompt": "You made a certificate with the common name localhost, but the browser still says the name does not match. What did it actually want?",
       "choices": [
         {
-          "id": "san",
-          "label": "The subject alternative name, which is the only name field browsers trust"
-        },
-        {
           "id": "cn",
           "label": "The common name spelled differently"
+        },
+        {
+          "id": "san",
+          "label": "The subject alternative name, which is the only name field browsers trust"
         },
         {
           "id": "serial",
@@ -86,7 +98,6 @@
       ],
       "correctChoiceId": "signature"
     },
-
     {
       "id": "why-the-warning",
       "topic": "browser",
@@ -113,16 +124,16 @@
       "prompt": "You added your root to the trust list, restarted the browser, and the padlock appeared. What changed about the certificate?",
       "choices": [
         {
-          "id": "nothing",
-          "label": "Nothing at all. Only who the browser is willing to trust changed"
+          "id": "upgraded",
+          "label": "The browser upgraded it to a trusted certificate"
         },
         {
           "id": "resigned",
           "label": "It was signed again, this time by an authority the browser knows"
         },
         {
-          "id": "upgraded",
-          "label": "The browser upgraded it to a trusted certificate"
+          "id": "nothing",
+          "label": "Nothing at all. Only who the browser is willing to trust changed"
         }
       ],
       "correctChoiceId": "nothing"
@@ -133,12 +144,12 @@
       "prompt": "You trusted your root on Windows and Chrome is happy, but Firefox still warns about the same page. Why?",
       "choices": [
         {
-          "id": "own-list",
-          "label": "Firefox keeps its own list of trusted roots and never reads the operating system's"
-        },
-        {
           "id": "cache",
           "label": "Firefox has cached the old warning and needs its cache cleared"
+        },
+        {
+          "id": "own-list",
+          "label": "Firefox keeps its own list of trusted roots and never reads the operating system's"
         },
         {
           "id": "unsupported",
@@ -157,22 +168,25 @@
           "label": "Comparing fingerprints, which are different for every certificate even when the names match"
         },
         {
-          "id": "the-name",
-          "label": "The name, since two roots cannot share one"
-        },
-        {
           "id": "newest",
           "label": "The dates, since the browser always uses the newest one"
+        },
+        {
+          "id": "the-name",
+          "label": "The name, since two roots cannot share one"
         }
       ],
       "correctChoiceId": "fingerprint"
     },
-
     {
       "id": "where-tls-stops",
       "topic": "proxy",
       "prompt": "In the setup you built, where does the encryption stop?",
       "choices": [
+        {
+          "id": "nowhere",
+          "label": "Nowhere. The whole path stays encrypted end to end"
+        },
         {
           "id": "at-proxy",
           "label": "At the proxy. Everything behind it speaks plain http"
@@ -180,10 +194,6 @@
         {
           "id": "at-backend",
           "label": "At the backend, which decrypts the request it is given"
-        },
-        {
-          "id": "nowhere",
-          "label": "Nowhere. The whole path stays encrypted end to end"
         }
       ],
       "correctChoiceId": "at-proxy"
@@ -198,12 +208,12 @@
           "label": "The backend cannot tell the original request was encrypted, so the proxy tells it"
         },
         {
-          "id": "encrypts",
-          "label": "It tells the backend to encrypt its reply"
-        },
-        {
           "id": "browser-set",
           "label": "The browser sets it so servers know it wants https"
+        },
+        {
+          "id": "encrypts",
+          "label": "It tells the backend to encrypt its reply"
         }
       ],
       "correctChoiceId": "tell-backend"
@@ -218,12 +228,12 @@
           "label": "The connection the backend sees is the proxy's; your browser never spoke to the backend"
         },
         {
-          "id": "docker-hides",
-          "label": "Docker replaces every address with a made-up one"
-        },
-        {
           "id": "https-hides",
           "label": "https hides the visitor's address from the server"
+        },
+        {
+          "id": "docker-hides",
+          "label": "Docker replaces every address with a made-up one"
         }
       ],
       "correctChoiceId": "proxy-connects"
@@ -234,12 +244,12 @@
       "prompt": "What is the main reason to put ten services behind one reverse proxy?",
       "choices": [
         {
-          "id": "one-cert-place",
-          "label": "One place deals with certificates, and the ten services never need to know about them"
-        },
-        {
           "id": "faster",
           "label": "Requests are faster because the proxy caches every reply"
+        },
+        {
+          "id": "one-cert-place",
+          "label": "One place deals with certificates, and the ten services never need to know about them"
         },
         {
           "id": "ten-certs",
@@ -248,23 +258,22 @@
       ],
       "correctChoiceId": "one-cert-place"
     },
-
     {
       "id": "java-own-store",
       "topic": "java",
       "prompt": "Your computer trusts your root and the browser shows a padlock, but a Java program connecting to the same address fails. Why?",
       "choices": [
         {
-          "id": "separate-list",
-          "label": "Java keeps its own list of trusted roots and does not read the operating system's"
+          "id": "needs-restart",
+          "label": "Java caches trust decisions until the machine is restarted"
         },
         {
           "id": "java-strict",
           "label": "Java refuses certificates that were not bought from an authority"
         },
         {
-          "id": "needs-restart",
-          "label": "Java caches trust decisions until the machine is restarted"
+          "id": "separate-list",
+          "label": "Java keeps its own list of trusted roots and does not read the operating system's"
         }
       ],
       "correctChoiceId": "separate-list"
@@ -295,12 +304,12 @@
       "prompt": "Which file do you import with keytool so a Java program will accept your site?",
       "choices": [
         {
-          "id": "the-root",
-          "label": "The root certificate, because that is what Java needs to decide who to trust"
-        },
-        {
           "id": "the-leaf",
           "label": "The certificate for localhost, because that is the one being served"
+        },
+        {
+          "id": "the-root",
+          "label": "The root certificate, because that is what Java needs to decide who to trust"
         },
         {
           "id": "the-key",
@@ -315,12 +324,12 @@
       "prompt": "What does a truststore decide?",
       "choices": [
         {
-          "id": "who-to-trust",
-          "label": "Which certificates this program is willing to accept as the start of a chain"
-        },
-        {
           "id": "which-cert-to-show",
           "label": "Which certificate this program shows when something connects to it"
+        },
+        {
+          "id": "who-to-trust",
+          "label": "Which certificates this program is willing to accept as the start of a chain"
         },
         {
           "id": "which-ciphers",

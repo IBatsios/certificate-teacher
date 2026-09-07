@@ -140,3 +140,36 @@ test("the test is open before the lessons are finished, and says so", async ({
     page.getByRole("button", { name: "Check my answers" }),
   ).toBeVisible();
 });
+
+/**
+ * Guards the thing that made the first version of this test meaningless: the
+ * correct answer was first in all sixteen questions, so clicking down the
+ * first column scored full marks without reading anything.
+ */
+test("the choices are in a different order each time the test is opened", async ({
+  page,
+}) => {
+  await signUpAndOpenTest(page);
+  const first = await choiceOrder(page);
+
+  await page.reload();
+  const second = await choiceOrder(page);
+
+  expect(first).toHaveLength(bank.questions.length);
+  expect(second).not.toEqual(first);
+});
+
+/** The choice ids of every question, in the order the page shows them. */
+async function choiceOrder(page: Page): Promise<string[]> {
+  return Promise.all(
+    bank.questions.map(async (question) =>
+      (
+        await page
+          .locator(`input[name="${question.id}"]`)
+          .evaluateAll((nodes) =>
+            nodes.map((node) => (node as HTMLInputElement).value).join(","),
+          )
+      ).toString(),
+    ),
+  );
+}
