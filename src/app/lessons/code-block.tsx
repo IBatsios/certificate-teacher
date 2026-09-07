@@ -26,12 +26,12 @@ export function CodeBlock({
   const isCommand = COPYABLE_LANGUAGES.has(language);
 
   return (
-    <figure className="my-4 overflow-hidden rounded-lg border border-neutral-300 bg-neutral-50">
-      <figcaption className="flex items-center justify-between gap-3 border-b border-neutral-200 py-1 pr-1 pl-3 text-xs text-neutral-600">
+    <figure className="my-4 overflow-hidden rounded-lg border border-line bg-sunken">
+      <figcaption className="flex items-center justify-between gap-3 border-b border-line-soft py-1 pr-1 pl-3 text-xs text-muted">
         <span>{label}</span>
         {isCommand && <CopyButton text={text} />}
       </figcaption>
-      <pre className="overflow-x-auto p-3 font-mono text-sm leading-relaxed text-neutral-900">
+      <pre className="overflow-x-auto p-3 font-mono text-sm leading-relaxed text-strong">
         <code>{text}</code>
       </pre>
     </figure>

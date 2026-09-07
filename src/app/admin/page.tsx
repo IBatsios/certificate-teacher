@@ -7,15 +7,15 @@ export default async function AdminReportPage() {
   const rows = await buildReport();
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-8 px-8 py-10">
+    <main className="mx-auto w-full flex max-w-6xl flex-col gap-8 px-8 py-10">
       <header className="flex flex-col gap-4">
-        <p className="text-sm font-medium tracking-wide text-neutral-600 uppercase">
+        <p className="text-sm font-medium tracking-wide text-muted uppercase">
           Admin
         </p>
-        <h1 className="text-3xl font-semibold text-balance text-neutral-900">
+        <h1 className="text-3xl font-semibold text-balance text-strong">
           Progress and results
         </h1>
-        <p className="max-w-3xl text-neutral-800">
+        <p className="max-w-3xl text-body">
           Every student, and how far they have got in the run they are on now. A
           student who starts over begins an empty run, so their earlier work
           stops showing here; it is kept and never deleted.
@@ -23,7 +23,7 @@ export default async function AdminReportPage() {
         <div className="flex flex-wrap items-center gap-4">
           <a
             href="/api/admin/export"
-            className="min-h-11 rounded bg-black px-5 leading-11 font-medium text-white transition-[background-color] duration-150 ease-out hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            className="min-h-11 rounded bg-accent px-5 leading-11 font-medium text-on-accent transition-[background-color] duration-150 ease-out hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             Download as a spreadsheet
           </a>
@@ -34,7 +34,7 @@ export default async function AdminReportPage() {
       </header>
 
       {rows.length === 0 ? (
-        <p className="rounded border border-neutral-300 bg-neutral-50 p-4 text-neutral-800">
+        <p className="rounded border border-line bg-sunken p-4 text-body">
           Nobody has signed up yet.
         </p>
       ) : (
@@ -53,7 +53,7 @@ function ReportTable({ rows }: { rows: ReadonlyArray<StudentReportRow> }) {
           test result
         </caption>
         <thead>
-          <tr className="border-b border-neutral-300">
+          <tr className="border-b border-line">
             <th scope="col" className="py-2 pr-4 font-semibold">
               Student
             </th>
@@ -75,7 +75,7 @@ function ReportTable({ rows }: { rows: ReadonlyArray<StudentReportRow> }) {
           {rows.map((row) => (
             <tr
               key={row.userId}
-              className="border-b border-neutral-200 align-top"
+              className="border-b border-line-soft align-top"
             >
               <th scope="row" className="py-3 pr-4 font-normal break-all">
                 {row.email}
@@ -83,7 +83,7 @@ function ReportTable({ rows }: { rows: ReadonlyArray<StudentReportRow> }) {
               <td className="py-3 pr-4 tabular-nums">
                 {row.stepsDone} of {row.stepsTotal}
                 {row.courseComplete && (
-                  <span className="ml-2 text-emerald-700">done</span>
+                  <span className="ml-2 text-done-ink-soft">done</span>
                 )}
               </td>
               <td className="py-3 pr-4">
@@ -95,11 +95,13 @@ function ReportTable({ rows }: { rows: ReadonlyArray<StudentReportRow> }) {
                 ) : (
                   <span
                     className={
-                      row.testPassed ? "text-emerald-700" : "text-amber-700"
+                      row.testPassed
+                        ? "text-done-ink-soft"
+                        : "text-notice-ink-soft"
                     }
                   >
                     {row.testPassed ? "passed" : "not yet"}{" "}
-                    <span className="text-neutral-600 tabular-nums">
+                    <span className="text-muted tabular-nums">
                       ({row.testCorrect} of {row.testTotal})
                     </span>
                   </span>
@@ -107,7 +109,7 @@ function ReportTable({ rows }: { rows: ReadonlyArray<StudentReportRow> }) {
               </td>
               <td className="py-3">
                 {row.focusAreas.length === 0 ? (
-                  <span className="text-neutral-400">—</span>
+                  <span className="text-faint">—</span>
                 ) : (
                   row.focusAreas.join(", ")
                 )}
@@ -126,7 +128,9 @@ function Verdict({ value }: { value: "passed" | "failed" | null }) {
   }
   return (
     <span
-      className={value === "passed" ? "text-emerald-700" : "text-amber-700"}
+      className={
+        value === "passed" ? "text-done-ink-soft" : "text-notice-ink-soft"
+      }
     >
       {value === "passed" ? "passed" : "not yet"}
     </span>
@@ -134,5 +138,5 @@ function Verdict({ value }: { value: "passed" | "failed" | null }) {
 }
 
 function NotYet() {
-  return <span className="text-neutral-500">not submitted</span>;
+  return <span className="text-faint">not submitted</span>;
 }

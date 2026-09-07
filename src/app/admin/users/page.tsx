@@ -14,7 +14,7 @@ export default async function AdminUsersPage({
   const users = await listUsers();
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
+    <main className="mx-auto w-full flex max-w-2xl flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">Students and admins</h1>
       <p>
         Everyone who has signed up. Each button gives that person the other
@@ -27,14 +27,14 @@ export default async function AdminUsersPage({
       {message !== undefined && (
         <p
           role="alert"
-          className="rounded border border-amber-400 bg-amber-50 p-3"
+          className="rounded border border-notice-line bg-notice p-3"
         >
           {message}
         </p>
       )}
       <table className="w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-neutral-300">
+          <tr className="border-b border-line">
             <th className="py-2 pr-4 font-medium">Email</th>
             <th className="py-2 pr-4 font-medium">Role</th>
             <th className="py-2 pr-4 font-medium">Signed up</th>
@@ -64,10 +64,10 @@ function UserRow({
 }) {
   const nextRole = otherRole(user.role);
   return (
-    <tr className="border-b border-neutral-200">
+    <tr className="border-b border-line-soft">
       <td className="py-2 pr-4">
         {user.email}
-        {isCurrentAdmin && <span className="text-neutral-600"> (you)</span>}
+        {isCurrentAdmin && <span className="text-muted"> (you)</span>}
       </td>
       <td className="py-2 pr-4">{user.role}</td>
       <td className="py-2 pr-4">{user.createdAt.toISOString().slice(0, 10)}</td>

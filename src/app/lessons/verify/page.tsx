@@ -22,15 +22,15 @@ export default async function VerifyPage({
   const latest = submissions[0];
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-8 py-10">
+    <main className="mx-auto w-full flex max-w-3xl flex-col gap-10 px-8 py-10">
       <header className="flex flex-col gap-4">
-        <p className="text-sm font-medium tracking-wide text-neutral-600 uppercase">
+        <p className="text-sm font-medium tracking-wide text-muted uppercase">
           Check your work
         </p>
-        <h1 className="text-3xl font-semibold text-balance text-neutral-900">
+        <h1 className="text-3xl font-semibold text-balance text-strong">
           Have your certificate checked
         </h1>
-        <p className="text-neutral-800">
+        <p className="text-body">
           Send the two certificates you made in{" "}
           <Link
             href={lessonPath("certificates")}
@@ -41,7 +41,7 @@ export default async function VerifyPage({
           and this page will tell you what it finds. Nothing here changes your
           certificates; it only reads them.
         </p>
-        <p className="rounded border border-neutral-300 bg-neutral-50 p-3 text-sm text-neutral-800">
+        <p className="rounded border border-line bg-sunken p-3 text-sm text-body">
           <strong className="font-semibold">
             Send the .crt files only, never a .key file.
           </strong>{" "}
@@ -53,7 +53,7 @@ export default async function VerifyPage({
       {message !== undefined && (
         <p
           role="alert"
-          className="rounded border border-amber-400 bg-amber-50 p-3"
+          className="rounded border border-notice-line bg-notice p-3"
         >
           {message}
         </p>
@@ -71,7 +71,7 @@ function SubmitForm() {
   return (
     <form
       action={checkSubmission}
-      className="flex flex-col gap-6 rounded-lg border border-neutral-300 p-5"
+      className="flex flex-col gap-6 rounded-lg border border-line p-5"
       aria-labelledby="submit-title"
     >
       <h2 id="submit-title" className="text-lg font-semibold">
@@ -93,7 +93,7 @@ function SubmitForm() {
 
       <button
         type="submit"
-        className="min-h-11 self-start rounded bg-black px-5 font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.97]"
+        className="min-h-11 self-start rounded bg-accent px-5 font-medium text-on-accent transition-[background-color,transform] duration-150 ease-out hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.97]"
       >
         Check them
       </button>
@@ -115,22 +115,22 @@ function Field({
   return (
     <fieldset className="flex flex-col gap-2">
       <legend className="font-medium">{label}</legend>
-      <p className="text-sm text-neutral-700">{hint}</p>
+      <p className="text-sm text-soft">{hint}</p>
       <label className="flex flex-col gap-1 text-sm">
-        <span className="text-neutral-700">Choose the file</span>
+        <span className="text-soft">Choose the file</span>
         <input
           type="file"
           name={fileName}
           accept=".crt,.pem,.cer,application/x-x509-ca-cert,text/plain"
-          className="rounded border border-neutral-300 p-2"
+          className="rounded border border-line p-2"
         />
       </label>
       <details className="text-sm">
-        <summary className="cursor-pointer text-neutral-700 underline underline-offset-2">
+        <summary className="cursor-pointer text-soft underline underline-offset-2">
           Or paste it instead
         </summary>
         <label className="mt-2 flex flex-col gap-1">
-          <span className="text-neutral-700">
+          <span className="text-soft">
             Open the file in a text editor and paste everything, including the
             BEGIN and END lines.
           </span>
@@ -138,7 +138,7 @@ function Field({
             name={textName}
             rows={6}
             spellCheck={false}
-            className="rounded border border-neutral-300 p-2 font-mono text-xs"
+            className="rounded border border-line p-2 font-mono text-xs"
           />
         </label>
       </details>
@@ -153,14 +153,12 @@ function Result({ submission }: { submission: SubmissionSummary }) {
     <section
       aria-labelledby="result-title"
       className={`rounded-lg border p-5 ${
-        passed
-          ? "border-emerald-300 bg-emerald-50"
-          : "border-amber-400 bg-amber-50"
+        passed ? "border-done-line bg-done" : "border-notice-line bg-notice"
       }`}
     >
       <h2
         id="result-title"
-        className={`text-lg font-semibold ${passed ? "text-emerald-900" : "text-amber-900"}`}
+        className={`text-lg font-semibold ${passed ? "text-done-ink" : "text-notice-ink"}`}
       >
         {passed
           ? "Your certificate is what the lesson asked for"
@@ -193,7 +191,7 @@ function Result({ submission }: { submission: SubmissionSummary }) {
                 </span>
               </span>
               {didFail && (
-                <span className="ml-6 text-sm text-neutral-800">
+                <span className="ml-6 text-sm text-body">
                   {check.whenFailed}
                 </span>
               )}
@@ -209,21 +207,21 @@ function WhatIsChecked() {
   return (
     <section
       aria-labelledby="what-title"
-      className="flex flex-col gap-3 border-t border-neutral-200 pt-8"
+      className="flex flex-col gap-3 border-t border-line-soft pt-8"
     >
       <h2 id="what-title" className="text-lg font-semibold">
         What is checked
       </h2>
-      <p className="text-neutral-700">
+      <p className="text-soft">
         Every certificate is judged against the same list, so nothing here is a
         matter of opinion.
       </p>
-      <ol className="flex list-decimal flex-col gap-1 pl-5 text-neutral-800">
+      <ol className="flex list-decimal flex-col gap-1 pl-5 text-body">
         {CERTIFICATE_CHECKS.map((check) => (
           <li key={check.key}>{check.title}</li>
         ))}
       </ol>
-      <p className="text-sm text-neutral-700">
+      <p className="text-sm text-soft">
         The one worth understanding is the signature. A certificate can name any
         issuer it likes; only the signature proves that issuer really made it.
       </p>
@@ -239,12 +237,12 @@ function Earlier({
   return (
     <section
       aria-labelledby="earlier-checks-title"
-      className="flex flex-col gap-3 border-t border-neutral-200 pt-8"
+      className="flex flex-col gap-3 border-t border-line-soft pt-8"
     >
       <h2 id="earlier-checks-title" className="text-lg font-semibold">
         Earlier checks
       </h2>
-      <ul className="flex flex-col gap-2 text-sm text-neutral-700">
+      <ul className="flex flex-col gap-2 text-sm text-soft">
         {submissions.map((submission) => (
           <li key={submission.id} className="tabular-nums">
             {formatDate(submission.createdAt)}:{" "}

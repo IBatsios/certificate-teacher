@@ -32,11 +32,11 @@ export function StepCard({
       <SpineMarker order={step.order} state={state} />
       <h2
         id={headingId}
-        className="text-xl font-semibold text-balance text-neutral-900"
+        className="text-xl font-semibold text-balance text-strong"
       >
         {step.title}
       </h2>
-      <div className="mt-2 text-neutral-800">
+      <div className="mt-2 text-body">
         <Markdown text={step.body} />
       </div>
       <Tick
@@ -52,10 +52,10 @@ export function StepCard({
 function SpineMarker({ order, state }: { order: number; state: StepState }) {
   const ring =
     state === "done"
-      ? "border-neutral-900 bg-neutral-900 text-white"
+      ? "border-accent bg-accent text-on-accent"
       : state === "next"
-        ? "border-emerald-600 bg-white text-emerald-700 ring-4 ring-emerald-100"
-        : "border-neutral-300 bg-white text-neutral-500";
+        ? "border-done-solid bg-surface text-done-ink-soft ring-4 ring-done-ring"
+        : "border-line bg-surface text-faint";
   return (
     <span
       aria-hidden="true"
@@ -81,12 +81,12 @@ function Tick({
     return (
       <form action={markNotDone} className="mt-4 flex items-center gap-4">
         <input type="hidden" name="stepKey" value={stepKey} />
-        <span className="inline-flex items-center gap-2 text-sm font-medium text-neutral-900">
+        <span className="inline-flex items-center gap-2 text-sm font-medium text-strong">
           <Check /> Done
         </span>
         <button
           type="submit"
-          className="min-h-10 rounded px-2 text-sm text-neutral-600 underline underline-offset-2 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+          className="min-h-10 rounded px-2 text-sm text-muted underline underline-offset-2 hover:text-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           Undo
         </button>
@@ -98,10 +98,10 @@ function Tick({
       <input type="hidden" name="stepKey" value={stepKey} />
       <button
         type="submit"
-        className={`min-h-11 rounded px-4 font-medium transition-[background-color,transform] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.97] ${
+        className={`min-h-11 rounded px-4 font-medium transition-[background-color,transform] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.97] ${
           state === "next"
-            ? "bg-neutral-900 text-white hover:bg-neutral-700"
-            : "border border-neutral-400 bg-white text-neutral-900 hover:bg-neutral-100"
+            ? "bg-accent text-on-accent hover:bg-accent-hover"
+            : "border border-line-strong bg-surface text-strong hover:bg-sunken"
         }`}
       >
         Mark done

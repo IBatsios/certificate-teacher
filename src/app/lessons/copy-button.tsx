@@ -31,7 +31,7 @@ export function CopyButton({ text }: { text: string }) {
       type="button"
       onClick={copy}
       aria-live="polite"
-      className="min-h-10 rounded px-3 text-xs font-medium text-neutral-600 transition-[background-color,transform] duration-150 ease-out hover:bg-neutral-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.97]"
+      className="min-h-10 rounded px-3 text-xs font-medium text-muted transition-[background-color,transform] duration-150 ease-out hover:bg-line-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.97]"
     >
       {isCopied ? "Copied" : "Copy"}
     </button>
