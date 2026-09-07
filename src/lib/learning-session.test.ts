@@ -13,7 +13,7 @@ import { prisma } from "@/lib/prisma";
 async function newStudent(): Promise<string> {
   const salt = Math.random().toString(36).slice(2, 10);
   const user = await prisma.user.create({
-    data: { email: `student-${salt}@unit.test`, role: "student" },
+    data: { email: `student-${salt}@session.unit.test`, role: "student" },
     select: { id: true },
   });
   return user.id;
@@ -21,7 +21,7 @@ async function newStudent(): Promise<string> {
 
 afterEach(async () => {
   await prisma.user.deleteMany({
-    where: { email: { endsWith: "@unit.test" } },
+    where: { email: { endsWith: "@session.unit.test" } },
   });
 });
 

@@ -15,6 +15,11 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // The only upload in the app is two certificates, a couple of kilobytes
+    // each. Next's default is 1MB; there is no reason to accept that much.
+    serverActions: { bodySizeLimit: "64kb" },
+  },
   poweredByHeader: false,
   async headers() {
     return [{ source: "/(.*)", headers: SECURITY_HEADERS }];

@@ -21,14 +21,14 @@ enum Role {
 // are kept as the adapter expects them. passwordHash is set only for people
 // who chose email and password; magic-link users never have one.
 model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String        @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role          @default(student)
-  passwordHash  String?
-  createdAt     DateTime      @default(now())
+  id               String            @id @default(cuid())
+  name             String?
+  email            String            @unique
+  emailVerified    DateTime?
+  image            String?
+  role             Role              @default(student)
+  passwordHash     String?
+  createdAt        DateTime          @default(now())
   accounts         Account[]
   sessions         Session[]
   testAttempts     TestAttempt[]
@@ -95,13 +95,14 @@ enum SessionStatus {
 }
 
 model LearningSession {
-  id         String         @id @default(cuid())
-  userId     String
-  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status     SessionStatus  @default(active)
-  startedAt  DateTime       @default(now())
-  archivedAt DateTime?
-  steps      StepProgress[]
+  id          String                  @id @default(cuid())
+  userId      String
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      SessionStatus           @default(active)
+  startedAt   DateTime                @default(now())
+  archivedAt  DateTime?
+  steps       StepProgress[]
+  submissions CertificateSubmission[]
 
   @@index([userId, status])
 }
@@ -116,4 +117,33 @@ model StepProgress {
   doneAt    DateTime        @default(now())
 
   @@unique([sessionId, stepKey])
+}
+
+// The verdict on one certificate a student submitted for checking. Only the
+// certificate is kept: it is public by nature, unlike the private key beside
+// it, which the app refuses and never stores. The parsed fields are written
+// down at submission time so an old submission still reads the same later,
+// even if the checks change.
+enum CertificateVerdict {
+  passed
+  failed
+}
+
+model CertificateSubmission {
+  id             String             @id @default(cuid())
+  sessionId      String
+  session        LearningSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  // The leaf, as PEM. The root is checked but not kept: it is the leaf that
+  // the student was asked to produce.
+  certificatePem String
+  subject        String
+  issuer         String
+  notBefore      DateTime
+  notAfter       DateTime
+  verdict        CertificateVerdict
+  // Which named checks failed, in the order they are shown. Empty when passed.
+  failedChecks   String[]
+  createdAt      DateTime           @default(now())
+
+  @@index([sessionId, createdAt])
 }

@@ -12,5 +12,10 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.test.ts"],
     setupFiles: ["./vitest.setup.ts"],
+    // One test file at a time. The data-access tests share one development
+    // database and run their writes at serializable isolation, so two files
+    // running together produce write conflicts that say nothing about the
+    // code. The whole suite takes a couple of seconds either way.
+    fileParallelism: false,
   },
 });

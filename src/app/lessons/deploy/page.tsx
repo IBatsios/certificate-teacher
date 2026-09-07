@@ -3,6 +3,7 @@ import { listArchivedSessions, startOrResume } from "@/lib/learning-session";
 import { loadLesson } from "@/lib/lesson";
 import { courseProgress } from "@/lib/lesson-progress";
 import { lessonMessageFor, lessonPath } from "@/lib/lesson-routes";
+import { VERIFY_PATH } from "../verify/messages";
 import { requireRole } from "@/lib/session";
 import { LessonView } from "../lesson-view";
 import { markDone, markNotDone, startOverAction } from "./actions";
@@ -18,8 +19,12 @@ const COURSE_FINISHED = {
     <>
       You made a certificate, served it, trusted it, looked behind the proxy
       that presented it, and taught Java to accept it. Nothing about the
-      certificate changed along the way, only who was willing to believe it.
-      When you are ready,{" "}
+      certificate changed along the way, only who was willing to believe it. If
+      you have not already, you can{" "}
+      <Link href={VERIFY_PATH} className="underline underline-offset-2">
+        have your certificate checked
+      </Link>
+      . When you are ready,{" "}
       <Link href="/test" className="underline underline-offset-2">
         take the test
       </Link>
