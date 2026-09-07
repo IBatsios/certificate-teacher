@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02, 05, 06.
 
-**Status:** built on `feature/admin-report` on 2026-09-07. Unit tests (151) and Playwright (35) green locally; pull request and CI pending.
+**Status:** done. Merged to `main` through pull request #16 on 2026-09-07 with CI green.
 
 ## Steps, a vertical slice in this order
 
@@ -23,7 +23,7 @@
 - [x] The end-to-end test passes: `e2e/admin-report.spec.ts`, six journeys.
 - [x] A student cannot reach the admin page or the export route. The route calls `requireRole` itself rather than trusting the proxy, and the test asks for it directly as well as through the browser (D64).
 - [x] Any migration is committed under `prisma/migrations/`. None was needed: this reads what Tasks 03 to 06 already write, and the indexes those tasks added cover it.
-- [x] Every earlier test still passes locally. CI is green: pending the pull request.
+- [x] Every earlier test still passes locally. CI was green on pull request #16.
 - [x] Any new environment variable is in `.env.example` with a placeholder. None was added.
 
 ## Suggested skills

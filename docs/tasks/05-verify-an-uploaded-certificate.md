@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02, 03.
 
-**Status:** built on `feature/verify-certificate` on 2026-09-07. Unit tests (95) and Playwright (22) green locally; pull request and CI pending.
+**Status:** done. Merged to `main` through pull request #14 on 2026-09-07 with CI green.
 
 ## Steps, a vertical slice in this order
 
@@ -23,7 +23,7 @@
 - [x] The end-to-end test passes: `e2e/verify-a-certificate.spec.ts`, five journeys.
 - [x] Anything containing `PRIVATE KEY` is refused and never stored. Checked on the raw text before parsing, again before the write, and covered by a unit test and an end-to-end test (D55).
 - [x] The migration is committed under `prisma/migrations/`: `20260907151118_certificate_submission`. The database was backed up first.
-- [x] Every earlier test still passes locally. CI is green: pending the pull request.
+- [x] Every earlier test still passes locally. CI was green on pull request #14.
 - [x] Any new environment variable is in `.env.example` with a placeholder. None was added.
 
 ## Suggested skills

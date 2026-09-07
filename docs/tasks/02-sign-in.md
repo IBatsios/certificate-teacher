@@ -6,7 +6,7 @@
 
 **Blocked by:** 01.
 
-**Status:** built on `feature/sign-in` on 2026-09-06; pull request #2 open with CI green, waiting on the merge. See `docs/handoff-items/handoff-after-task-02.md`.
+**Status:** done. Merged to `main` through pull request #2 on 2026-09-06 with CI green.
 
 ## Steps, in order
 

@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02, 03.
 
-**Status:** built on `feature/deploy-lesson` on 2026-09-06. Unit tests (71) and Playwright (17) green locally; pull request and CI pending.
+**Status:** done. Merged to `main` through pull request #8 on 2026-09-06 with CI green. Follow-ups #10, #12, and #13 corrected the lesson after it was walked.
 
 ## Steps, a vertical slice in this order
 
@@ -22,7 +22,7 @@
 - [x] Vitest covers the data-access functions as a caller would observe them, and passes. `learning-session.ts` needed no change, so its Task 03 tests still stand; the new pure functions `courseProgress` and the lesson routes are covered.
 - [x] The end-to-end test passes: `e2e/deploy-the-certificate.spec.ts`, three journeys.
 - [x] Any migration is committed under `prisma/migrations/`. None was needed: `StepProgress.stepKey` is a free-form string, so the deploy steps are new key values and nothing here needs data beyond `doneAt`. Step 1 of this task suggested a migration; it would have been empty.
-- [x] Every earlier test still passes locally. CI is green: pending the pull request.
+- [x] Every earlier test still passes locally. CI was green on pull request #8.
 - [x] Any new environment variable is in `.env.example` with a placeholder. None was added.
 
 ## Suggested skills
