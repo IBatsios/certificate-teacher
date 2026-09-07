@@ -38,6 +38,10 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       ADMIN_EMAIL: process.env.E2E_ADMIN_EMAIL,
+      // Blank so the tests always take the SMTP path to Mailpit and read
+      // the link back, even on a machine whose .env carries a real Resend
+      // key. An empty value reads as unset (D66).
+      AUTH_RESEND_KEY: "",
       // Production-shaped: `next start` refuses a host it was not told
       // about, and the startup check in src/instrumentation.ts wants all
       // three together. Railway gets the same three (D41).
