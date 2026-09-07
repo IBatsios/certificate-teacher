@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02, 04.
 
-**Status:** built on `feature/test-phase` on 2026-09-07. Unit tests (130) and Playwright (28) green locally; pull request and CI pending.
+**Status:** done. Merged to `main` through pull request #15 on 2026-09-07 with CI green. The choice shuffle (D61) landed on the same pull request after review.
 
 ## Steps, a vertical slice in this order
 
@@ -22,7 +22,7 @@
 - [x] Vitest covers the scorer and the data-access functions as a caller would observe them, and passes. 30 new tests, including the question bank loader.
 - [x] The end-to-end test passes: `e2e/test-phase.spec.ts`, six journeys.
 - [x] The migration is committed under `prisma/migrations/`: `20260907170558_test_attempt`. The database was backed up first.
-- [x] Every earlier test still passes locally. CI is green: pending the pull request.
+- [x] Every earlier test still passes locally. CI was green on pull request #15.
 - [x] Any new environment variable is in `.env.example` with a placeholder. None was added.
 
 ## Suggested skills

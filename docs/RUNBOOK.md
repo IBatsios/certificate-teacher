@@ -117,3 +117,14 @@ Pick the next task from the **frontier**: any task whose "Blocked by" list is en
 ## Done
 
 v1 is done when the last task's acceptance criteria, which are the intake's definition of done, are all checked.
+
+**v1 is done, on 2026-09-07.** All nine tasks are merged with CI green, and
+Task 09 verified the intake's definition of done against `main` at 9fd1c7b,
+which is the commit production is running. Live at
+<https://teacher.ioannisbatsios.com>; the apex serves the personal website
+(D40).
+
+What to do next is in `docs/handoff-items/handoff-after-v1.md`. Do **not** run
+`/kickoff` to regenerate this file or anything in `docs/tasks/`: they have been
+edited by hand since they were generated, and a regenerate would overwrite the
+acceptance criteria, the build notes, and D51 to D64.

@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02.
 
-**Status:** built on `feature/certificates-lesson` on 2026-09-06; pull request #3 open with CI green, waiting on the merge. See `docs/handoff-items/handoff-after-task-03.md`.
+**Status:** done. Merged to `main` through pull request #3 on 2026-09-06 with CI green.
 
 ## Steps, a vertical slice in this order
 
