@@ -36,4 +36,27 @@ The warning is gone and there is a **padlock** in the address bar. Click it, the
 
 Nothing about the certificate changed between the warning and the padlock. The only thing that changed is who your browser trusts.
 
+**If the warning is still there.** Two things cause this nearly every time.
+
+The first is the browser: closing the tab is not enough, and on Windows Chrome often keeps running in the background after the window is shut. Quit it from the system tray, or run `Get-Process chrome | Stop-Process` in PowerShell, then open it again.
+
+The second is subtler, and it catches people who have been through the first lesson more than once. Every run of that lesson makes a **brand new root**, and every one of them is called `My Root`. The name is only a label. Trusting an older root does nothing at all for a certificate signed by a newer one, so your browser can show `My Root` in its trusted list and still refuse the page. Check whether the root in this folder is the one your computer trusts by comparing fingerprints, which are unique to each certificate in a way the name is not.
+
+Windows, in PowerShell:
+
+```powershell
+openssl x509 -in my-root.crt -noout -fingerprint -sha1
+Get-ChildItem Cert:\CurrentUser\Root | Where-Object { $_.Subject -eq 'CN=My Root' } | Select-Object Thumbprint, NotAfter
+```
+
+Mac or Linux, in Terminal:
+
+```bash
+openssl x509 -in my-root.crt -noout -fingerprint -sha1
+```
+
+then find `My Root` in Keychain Access, or in Firefox's certificate list, and read its SHA-1 fingerprint.
+
+The two strings of digits should be the same once you ignore the colons in the first one. If they differ, the root in this folder is not the one being trusted: import it with the steps above, and delete the older entry so you are not left guessing which is which later.
+
 Tick this step when you see the padlock at <https://localhost:8443>.
