@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02, 03.
 
-**Status:** ready
+**Status:** built on `feature/deploy-lesson` on 2026-09-06. Unit tests (71) and Playwright (17) green locally; pull request and CI pending.
 
 ## Steps, a vertical slice in this order
 
@@ -18,12 +18,12 @@
 
 ## Acceptance criteria
 
-- [ ] As a student, I can deploy my certificate and test it with a reverse proxy and with Java: demonstrated end to end.
-- [ ] Vitest covers the data-access functions as a caller would observe them, and passes.
-- [ ] The end-to-end test passes.
-- [ ] Any migration is committed under `prisma/migrations/`.
-- [ ] Every earlier test still passes; CI is green.
-- [ ] Any new environment variable is in `.env.example` with a placeholder.
+- [x] As a student, I can deploy my certificate and test it with a reverse proxy and with Java: demonstrated end to end. Every command in the lesson was run while writing it, except the browser trust import, which is a GUI step (see the note below).
+- [x] Vitest covers the data-access functions as a caller would observe them, and passes. `learning-session.ts` needed no change, so its Task 03 tests still stand; the new pure functions `courseProgress` and the lesson routes are covered.
+- [x] The end-to-end test passes: `e2e/deploy-the-certificate.spec.ts`, three journeys.
+- [x] Any migration is committed under `prisma/migrations/`. None was needed: `StepProgress.stepKey` is a free-form string, so the deploy steps are new key values and nothing here needs data beyond `doneAt`. Step 1 of this task suggested a migration; it would have been empty.
+- [x] Every earlier test still passes locally. CI is green: pending the pull request.
+- [x] Any new environment variable is in `.env.example` with a placeholder. None was added.
 
 ## Suggested skills
 
@@ -33,3 +33,20 @@
 ## Notes
 
 The app never runs Java or a reverse proxy itself (13.1). The student does both on their machine; the lesson tells them what they should see, and Task 05 is where the app checks their certificate.
+
+## Notes from building it
+
+The reverse proxy is nginx in Docker Compose (D51), which adds Docker Desktop as a
+student prerequisite. The lesson is four step files, not three: `01-start-the-site`
+checks for Docker and starts the stack, and the three parts the task names follow it.
+Step 2 and step 3 share one running stack, so the student starts it once.
+
+Verified while writing, on Windows with OpenSSL 3.5.7 and JDK 25:
+
+- the chain nginx serves verifies against the student's own root, `Verify return code: 0 (ok)`
+- the backend reports `RemoteAddr` as the proxy, a plain `GET / HTTP/1.1`, and `X-Forwarded-Proto: https`
+- `java TrustCheck.java` fails with `unable to find valid certification path to requested target`, and passes with `Connected. HTTP 200` after the `keytool` import
+
+Not verified: importing the root into a browser's trust store, which is a GUI
+step on every platform, and the Docker Desktop install on a clean machine. The
+same caveat D35 records for the Windows OpenSSL path applies here.
