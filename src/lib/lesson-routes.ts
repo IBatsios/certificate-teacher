@@ -5,7 +5,8 @@
 export const LESSONS_ROOT = "/lessons";
 
 // The lessons a student works through, in order. "Finished" means every step
-// of every one of these, not either lesson alone.
+// of every one of these, not either lesson alone. What the course they belong
+// to is called, and what else Teacher will teach, is in `src/lib/courses.ts`.
 export const COURSE_SLUGS = ["certificates", "deploy"] as const;
 
 // Messages a lesson page can show, keyed by the value in `?message=`. One of
