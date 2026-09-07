@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Role } from "@/generated/prisma/enums";
 import { requireRole } from "@/lib/session";
 import { listUsers, type UserSummary } from "@/lib/users";
@@ -17,7 +18,11 @@ export default async function AdminUsersPage({
       <h1 className="text-2xl font-semibold">Students and admins</h1>
       <p>
         Everyone who has signed up. Each button gives that person the other
-        role. Progress and results arrive here in a later task.
+        role.{" "}
+        <Link href="/admin" className="underline underline-offset-2">
+          Progress and results
+        </Link>{" "}
+        are on their own page.
       </p>
       {message !== undefined && (
         <p
