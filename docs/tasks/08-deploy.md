@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02.
 
-**Status:** in progress on `feature/deploy-railway` since 2026-09-06.
+**Status:** done. Live at https://teacher.ioannisbatsios.com since 2026-09-06; pull requests #4, #5, and #6. See `docs/handoff-items/handoff-after-task-08.md`.
 
 ## Steps, in order
 
@@ -19,8 +19,8 @@
 
 ## Acceptance criteria
 
-- [ ] Reachable at https://ioannisbatsios.com.
-- [ ] "It must confirm their knowledge that they were able to apply and deploy; include a test phase they have to complete to pass" works on the live URL.
+- [x] Reachable at https://teacher.ioannisbatsios.com. (The apex serves the personal website; D40. Verified 2026-09-06 with a valid certificate and every security header.)
+- [x] "It must confirm their knowledge that they were able to apply and deploy; include a test phase they have to complete to pass" works on the live URL. (Walked on 2026-09-06: sign-up, a lesson tick, the test recording a pass, sign-out, sign-in with progress intact, no console errors.)
 - [x] `prisma migrate deploy` runs on every release before traffic is served. (Railway's pre-deploy command on the service; deployment 74ddc010 on 2026-09-06 ran it before the health check.)
 - [x] No secret is in the repository; every one is in Railway's variables. (gitleaks clean; variables set on the service on 2026-09-06.)
 - [x] A deploy from the default branch is repeatable, and `README.md` says how. (GitHub connection on `main`, or `railway redeploy --from-source`; README, Deploy.)
