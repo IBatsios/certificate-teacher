@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { signIn } from "@/auth";
 import { HOME_BY_ROLE, SIGN_IN_PATH } from "@/lib/access";
+import { emailTransport } from "@/lib/env";
 import { normalizeEmail } from "@/lib/roles";
 import { allowPasswordAttempt, allowSignInLink } from "@/lib/sign-in-limits";
 import { findUserByEmail } from "@/lib/users";
@@ -86,7 +87,8 @@ export async function sendSignInLink(formData: FormData): Promise<void> {
 
 async function trySendSignInLink(email: string): Promise<boolean> {
   try {
-    await signIn("nodemailer", {
+    // The provider id follows the transport the environment chose (D66).
+    await signIn(emailTransport(process.env), {
       email,
       redirect: false,
       redirectTo: SIGN_IN_PATH,

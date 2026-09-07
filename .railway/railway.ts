@@ -31,6 +31,7 @@ export default defineRailway(() => {
     deploy: { restartPolicyMaxRetries: 5 },
     domains: ["teacher.ioannisbatsios.com"],
     env: {
+      AUTH_RESEND_KEY: preserve(),
       AUTH_SECRET: preserve(),
       AUTH_TRUST_HOST: preserve(),
       AUTH_URL: preserve(),
