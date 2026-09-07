@@ -1,77 +1,64 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { loadQuestionBank, type Question } from "@/lib/questions";
+import { score, type Answer } from "@/lib/score";
 import { requireRole } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
-import { QUESTIONS, type Question } from "@/lib/questions";
-import { score, type Answer, type ScoreResult } from "@/lib/score";
+import { recordAttempt } from "@/lib/test-attempt";
 import { testPageWithMessage } from "./messages";
-
-// One form field per question, named by the question id, holding a choice id.
-// The choice must be one the question actually offers.
-const submissionSchema = z.object(byQuestionId(choiceSchemaFor));
-
-function byQuestionId<T>(
-  valueFor: (question: Question) => T,
-): Record<string, T> {
-  return Object.fromEntries(
-    QUESTIONS.map((question) => [question.id, valueFor(question)]),
-  );
-}
-
-function choiceSchemaFor(question: Question) {
-  return z
-    .string()
-    .refine((choiceId) =>
-      question.choices.some((choice) => choice.id === choiceId),
-    );
-}
-
-function readRawAnswers(formData: FormData): Record<string, unknown> {
-  return byQuestionId((question) => formData.get(question.id));
-}
-
-function toAnswers(data: Record<string, string>): ReadonlyArray<Answer> {
-  return Object.entries(data).map(([questionId, choiceId]) => ({
-    questionId,
-    choiceId,
-  }));
-}
-
-async function recordAttempt(
-  userId: string,
-  result: ScoreResult,
-): Promise<string | null> {
-  try {
-    const attempt = await prisma.testAttempt.create({
-      data: { userId, passed: result.passed },
-      select: { id: true },
-    });
-    return attempt.id;
-  } catch (error) {
-    console.error("Could not save the test attempt", error);
-    return null;
-  }
-}
 
 /**
  * Scores the submitted answers, records the attempt, and sends the student to
  * the result. Redirects happen outside try/catch because `redirect` throws.
+ *
+ * Every question must be answered. A part-finished test would be scored as
+ * though the missing answers were wrong, which is a harsher verdict than the
+ * student intended to ask for.
  */
 export async function submitTestAttempt(formData: FormData): Promise<void> {
   const student = await requireRole("student");
+  const bank = await loadQuestionBank();
 
-  const parsed = submissionSchema.safeParse(readRawAnswers(formData));
-  if (!parsed.success) {
+  const answers = readAnswers(formData, bank.questions);
+  if (answers === null) {
     redirect(testPageWithMessage("unanswered"));
   }
 
-  const result = score(toAnswers(parsed.data), QUESTIONS);
-  const attemptId = await recordAttempt(student.id, result);
+  const result = score(answers, bank.questions);
+
+  let attemptId: string | null = null;
+  try {
+    attemptId = (await recordAttempt(student.id, result)).id;
+  } catch (error) {
+    console.error("Could not save the test attempt", error);
+  }
   if (attemptId === null) {
     redirect(testPageWithMessage("not-saved"));
   }
 
   redirect(`/test?attempt=${attemptId}`);
+}
+
+/**
+ * One answer per question, or null unless every question was answered with a
+ * choice it actually offers. Anything else is a form that did not come from
+ * the page as rendered.
+ */
+function readAnswers(
+  formData: FormData,
+  questions: ReadonlyArray<Question>,
+): ReadonlyArray<Answer> | null {
+  const answers: Answer[] = [];
+  for (const question of questions) {
+    const choiceId = formData.get(question.id);
+    if (typeof choiceId !== "string") {
+      return null;
+    }
+    const offered = question.choices.some((choice) => choice.id === choiceId);
+    if (!offered) {
+      return null;
+    }
+    answers.push({ questionId: question.id, choiceId });
+  }
+  return answers;
 }
