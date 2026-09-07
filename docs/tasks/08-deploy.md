@@ -21,10 +21,10 @@
 
 - [ ] Reachable at https://ioannisbatsios.com.
 - [ ] "It must confirm their knowledge that they were able to apply and deploy; include a test phase they have to complete to pass" works on the live URL.
-- [ ] `prisma migrate deploy` runs on every release before traffic is served.
-- [ ] No secret is in the repository; every one is in Railway's variables.
-- [ ] A deploy from the default branch is repeatable, and `README.md` says how.
-- [ ] A backup step precedes the migration in the release procedure.
+- [x] `prisma migrate deploy` runs on every release before traffic is served. (Railway's pre-deploy command on the service; deployment 74ddc010 on 2026-09-06 ran it before the health check.)
+- [x] No secret is in the repository; every one is in Railway's variables. (gitleaks clean; variables set on the service on 2026-09-06.)
+- [x] A deploy from the default branch is repeatable, and `README.md` says how. (GitHub connection on `main`, or `railway redeploy --from-source`; README, Deploy.)
+- [x] A backup step precedes the migration in the release procedure. (README, Before merging a migration; daily schedule on the Postgres service.)
 
 ## Suggested skills
 
