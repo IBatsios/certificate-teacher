@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02, 04.
 
-**Status:** ready
+**Status:** built on `feature/test-phase` on 2026-09-07. Unit tests (130) and Playwright (28) green locally; pull request and CI pending.
 
 ## Steps, a vertical slice in this order
 
@@ -18,12 +18,12 @@
 
 ## Acceptance criteria
 
-- [ ] As a student, I can take the test and see a pass or fail with focus areas: demonstrated end to end.
-- [ ] Vitest covers the scorer and the data-access functions as a caller would observe them, and passes.
-- [ ] The end-to-end test passes.
-- [ ] The migration is committed under `prisma/migrations/`.
-- [ ] Every earlier test still passes; CI is green.
-- [ ] Any new environment variable is in `.env.example` with a placeholder.
+- [x] As a student, I can take the test and see a pass or fail with focus areas: demonstrated end to end, for a pass, one missed topic, and two.
+- [x] Vitest covers the scorer and the data-access functions as a caller would observe them, and passes. 30 new tests, including the question bank loader.
+- [x] The end-to-end test passes: `e2e/test-phase.spec.ts`, six journeys.
+- [x] The migration is committed under `prisma/migrations/`: `20260907170558_test_attempt`. The database was backed up first.
+- [x] Every earlier test still passes locally. CI is green: pending the pull request.
+- [x] Any new environment variable is in `.env.example` with a placeholder. None was added.
 
 ## Suggested skills
 
@@ -34,3 +34,29 @@
 ## Notes
 
 The pass mark, and whether the test is locked until the lesson steps are done, are not specified in the intake. Choose, and record both in `docs/DECISIONS.md`.
+
+## Notes from building it
+
+The two decisions the task left open are D58 (the pass mark) and D59 (no lock).
+D60 covers the question bank being a validated JSON file.
+
+The migration needed care. `TestAttempt` already exists and production may hold
+rows, so a required `sessionId` would have failed there. It is nullable, and
+`correct` and `total` are defaulted, so the migration is safe on a table that
+already has data. Attempts made before this task genuinely belong to no
+session, and saying so is more honest than inventing one.
+
+The interface stayed a server action rather than the
+`src/app/api/test-attempts/route.ts` the task names, for the reasons in D32 and
+D56. The page was already an action, so this is no change rather than a
+deviation.
+
+Found in review: the correct answer was the first choice in all sixteen
+questions, so a student who read nothing and clicked down the first column
+scored sixteen of sixteen and passed. The page now shuffles the choices on
+every render, the file on disk is no longer ordered by answer, and an
+end-to-end test fails if the order ever stops changing (D61).
+
+Still not verified: the questions themselves. Every one is answerable from the
+lessons, but whether the distractors are fair, and whether a real student reads
+them the way they were meant, is a judgement no test makes.

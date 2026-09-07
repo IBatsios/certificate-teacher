@@ -77,13 +77,27 @@ model VerificationToken {
 
 // One submission of the test by a signed-in student.
 model TestAttempt {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  passed    Boolean
-  createdAt DateTime @default(now())
+  id         String           @id @default(cuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // The run the attempt belongs to. Optional because attempts recorded before
+  // Task 06 belong to no session, and inventing one for them would be a lie;
+  // a required column here would also fail the migration wherever such rows
+  // already exist.
+  sessionId  String?
+  session    LearningSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  passed     Boolean
+  // The score as it was judged at the time. Kept rather than recomputed, so an
+  // old attempt still reads the same after the questions or the pass mark
+  // change. Defaulted for the rows that predate them.
+  correct    Int              @default(0)
+  total      Int              @default(0)
+  // Topic ids not passed, in the order they were asked. Empty on a pass.
+  focusAreas String[]
+  createdAt  DateTime         @default(now())
 
   @@index([userId])
+  @@index([sessionId, createdAt])
 }
 
 // A student's run through the lessons, named to stay clear of Auth.js's
@@ -95,14 +109,15 @@ enum SessionStatus {
 }
 
 model LearningSession {
-  id          String                  @id @default(cuid())
-  userId      String
-  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status      SessionStatus           @default(active)
-  startedAt   DateTime                @default(now())
-  archivedAt  DateTime?
-  steps       StepProgress[]
-  submissions CertificateSubmission[]
+  id           String                  @id @default(cuid())
+  userId       String
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       SessionStatus           @default(active)
+  startedAt    DateTime                @default(now())
+  archivedAt   DateTime?
+  steps        StepProgress[]
+  submissions  CertificateSubmission[]
+  testAttempts TestAttempt[]
 
   @@index([userId, status])
 }
