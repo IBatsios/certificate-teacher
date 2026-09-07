@@ -67,8 +67,10 @@ docker compose up -d
 
 The first run downloads both programs and takes a minute. When it finishes, open <https://localhost:8443> in your browser.
 
-**Your browser will refuse to show the page.** That is correct, and it is the whole point of the next step. You will see a full-page warning saying the connection is not private, with a phrase like `NET::ERR_CERT_AUTHORITY_INVALID` or `Potential Security Risk Ahead`. Your certificate is being served perfectly; your browser has simply never heard of the root that signed it.
+**What happens next depends on your computer, and either answer is fine.**
 
-Do not click through the warning. Step 2 removes it properly.
+**If your browser refuses to show the page**, that is the usual first-time result and it is the whole point of the next step. You will see a full-page warning saying the connection is not private, with a phrase like `NET::ERR_CERT_AUTHORITY_INVALID` or `Potential Security Risk Ahead`. Your certificate is being served perfectly; your browser has simply never heard of the root that signed it. Do not click through the warning. Step 2 removes it properly.
 
-Tick this step when the warning page appears at <https://localhost:8443>.
+**If the page loads straight away** and shows a block of text about the request, your computer already trusts your root. That happens when you have been through this lesson before: nothing here ever removes a root once you have added one, so it stays trusted until you take it out yourself. Nothing is wrong. Read step 2 anyway, because it explains what that trust actually is and how to check that the root being trusted is the one in this folder rather than an older one with the same name.
+
+Tick this step when <https://localhost:8443> answers at all, with either the warning or the page.
