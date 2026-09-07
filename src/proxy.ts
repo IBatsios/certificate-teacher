@@ -1,19 +1,24 @@
-import NextAuth from "next-auth";
+import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
-import { authConfig } from "@/auth.config";
 import { decideAccess, FORBIDDEN_PATH } from "@/lib/access";
 import { isTrustedOrigin, ORIGIN_SECRET_HEADER } from "@/lib/origin";
+import { isRole } from "@/lib/roles";
 
-// The proxy runs on every page request. It only decodes the session cookie;
-// the database is never read here. Pages and actions check again, closer to
-// the data, through src/lib/session.ts.
-const { auth } = NextAuth(authConfig);
+// The proxy runs on every page request. It only decodes the session cookie,
+// read-only: it never writes one back, so nothing that happens here can
+// bring a session back after sign-out (D49). The database is never read
+// here. Pages and actions check again, closer to the data, through
+// src/lib/session.ts.
 
 // Railway's health check reaches the container without going through
 // Cloudflare, so the home page stays open to it. It holds nothing private.
 const HEALTH_CHECK_PATH = "/";
 
-export const proxy = auth((request) => {
+// Auth.js prefixes the cookie name over HTTPS; behind Railway's proxy the
+// surest way to know which name is in play is to look for it.
+const SECURE_SESSION_COOKIE = "__Secure-authjs.session-token";
+
+export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   if (
     pathname !== HEALTH_CHECK_PATH &&
@@ -25,8 +30,7 @@ export const proxy = auth((request) => {
     return new NextResponse("Not available this way.", { status: 403 });
   }
 
-  const role = request.auth?.user.role ?? null;
-  const decision = decideAccess(pathname, role);
+  const decision = decideAccess(pathname, await roleFromCookie(request));
 
   switch (decision.kind) {
     case "allow":
@@ -36,7 +40,21 @@ export const proxy = auth((request) => {
     case "forbid":
       return NextResponse.redirect(new URL(FORBIDDEN_PATH, request.nextUrl));
   }
-});
+}
+
+/** The role in the session cookie, or null when there is no valid session. */
+async function roleFromCookie(request: NextRequest) {
+  const secret = process.env.AUTH_SECRET;
+  if (secret === undefined || secret === "") {
+    return null;
+  }
+  const token = await getToken({
+    req: request,
+    secret,
+    secureCookie: request.cookies.has(SECURE_SESSION_COOKIE),
+  });
+  return isRole(token?.role) ? token.role : null;
+}
 
 /**
  * A fresh nonce per page, so only scripts Next itself emits can run. The
