@@ -72,11 +72,13 @@ What the parts mean:
 - `-storepass changeit` is the password on the file. `changeit` is the traditional default and is genuinely what Java's own truststore ships with. Fine for a lesson; choose something real for anything else.
 - `-noprompt` skips the "trust this certificate?" question, which you already answered by running the command.
 
-**Run it again, with the truststore.** Two settings tell Java to use your file instead of its own:
+**Run it again, with the truststore.** Two settings tell Java to use your file instead of its own. Keep the quotation marks exactly where they are:
 
 ```shell
-java -Djavax.net.ssl.trustStore=my-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit TrustCheck.java
+java "-Djavax.net.ssl.trustStore=my-truststore.p12" "-Djavax.net.ssl.trustStorePassword=changeit" TrustCheck.java
 ```
+
+The quotes are not decoration. Without them PowerShell breaks each setting apart at the first full stop and hands Java the fragment `.net.ssl.trustStore=my-truststore.p12` as though it were the name of a program to run, and you get `Could not find or load main class`. The quotes keep each setting in one piece. They do no harm on a Mac or Linux, which is why the line is written this way for everyone.
 
 ```text
 Connected. HTTP 200
