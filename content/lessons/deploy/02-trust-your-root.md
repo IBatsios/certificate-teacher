@@ -26,7 +26,11 @@ sudo apt install libnss3-tools
 certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n "My Root" -i my-root.crt
 ```
 
-**Firefox, on every system.** Firefox ignores the lists above and keeps its own. Open **Settings**, search for `certificates`, and click **View Certificates**. On the **Authorities** tab click **Import**, choose `my-root.crt`, tick **Trust this CA to identify websites**, and click **OK**.
+**Firefox, on every system.** Firefox is the one worth understanding rather than just following. It does not read the list your operating system keeps at all. It ships its own, stored in a small database inside your Firefox profile folder, and consults only that. So trusting your root in Windows or on a Mac does nothing whatsoever for Firefox, and a root trusted in Firefox does nothing for Chrome. It is kept per profile, too, so a second Firefox profile will not know about it either.
+
+This is why the same page can show a padlock in one browser and a warning in another on the same computer, with the same certificate. Nothing is broken when that happens; you have simply told one list and not the other.
+
+Open **Settings**, search for `certificates`, and click **View Certificates**. On the **Authorities** tab click **Import**, choose `my-root.crt`, tick **Trust this CA to identify websites**, and click **OK**.
 
 **Now close your browser completely and open it again.** Not just the tab: browsers read the trust list at start-up, and this is the most common reason this step appears not to work.
 
