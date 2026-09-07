@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listArchivedSessions, startOrResume } from "@/lib/learning-session";
 import { loadLesson } from "@/lib/lesson";
 import { lessonMessageFor, lessonPath } from "@/lib/lesson-routes";
+import { VERIFY_PATH } from "../verify/messages";
 import { requireRole } from "@/lib/session";
 import { LessonView } from "../lesson-view";
 import { markDone, markNotDone, startOverAction } from "./actions";
@@ -22,7 +23,11 @@ const FINISHED = {
         the deploy lesson
       </Link>{" "}
       turns them into a real https website, shows you what a reverse proxy does,
-      and teaches Java to trust what you made.
+      and teaches Java to trust what you made. You can also{" "}
+      <Link href={VERIFY_PATH} className="underline underline-offset-2">
+        have your certificate checked
+      </Link>{" "}
+      first.
     </>
   ),
 };
