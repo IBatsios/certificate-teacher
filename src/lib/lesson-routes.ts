@@ -4,6 +4,10 @@
 
 export const LESSONS_ROOT = "/lessons";
 
+// The lessons a student works through, in order. "Finished" means every step
+// of every one of these, not either lesson alone.
+export const COURSE_SLUGS = ["certificates", "deploy"] as const;
+
 // Messages a lesson page can show, keyed by the value in `?message=`. One of
 // them reports success, so the parameter is not called `error`.
 export const LESSON_MESSAGES = {

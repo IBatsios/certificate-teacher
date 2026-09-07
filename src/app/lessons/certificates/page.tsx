@@ -1,24 +1,28 @@
 import Link from "next/link";
 import { listArchivedSessions, startOrResume } from "@/lib/learning-session";
 import { loadLesson } from "@/lib/lesson";
-import { lessonMessageFor } from "@/lib/lesson-routes";
+import { lessonMessageFor, lessonPath } from "@/lib/lesson-routes";
 import { requireRole } from "@/lib/session";
 import { LessonView } from "../lesson-view";
 import { markDone, markNotDone, startOverAction } from "./actions";
 
 const LESSON_SLUG = "certificates";
+const NEXT_LESSON_SLUG = "deploy";
 
 const FINISHED = {
   title: "Every step is done",
   body: (
     <>
       You have a root and a leaf on your computer, and you have seen the chain
-      between them. The deploy lesson, which puts them to work, arrives next.
-      Until then you can{" "}
-      <Link href="/test" className="underline underline-offset-2">
-        take the test
-      </Link>
-      .
+      between them. Now put them to work:{" "}
+      <Link
+        href={lessonPath(NEXT_LESSON_SLUG)}
+        className="underline underline-offset-2"
+      >
+        the deploy lesson
+      </Link>{" "}
+      turns them into a real https website, shows you what a reverse proxy does,
+      and teaches Java to trust what you made.
     </>
   ),
 };
