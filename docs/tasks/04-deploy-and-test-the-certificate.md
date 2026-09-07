@@ -50,3 +50,9 @@ Verified while writing, on Windows with OpenSSL 3.5.7 and JDK 25:
 Not verified: importing the root into a browser's trust store, which is a GUI
 step on every platform, and the Docker Desktop install on a clean machine. The
 same caveat D35 records for the Windows OpenSSL path applies here.
+
+Correction: "every command was run while writing" was true of Git Bash, not of
+PowerShell, and the two do not agree. The `java -D...` line in step 4 was
+verified only under bash and turned out to be broken in PowerShell, where the
+setting is split at the first full stop. A `shell` fence claims a command works
+in both, so both is what it has to be run in.
