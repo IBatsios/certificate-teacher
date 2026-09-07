@@ -63,5 +63,16 @@ It says nothing about this upload path. The review of that path was done by
 hand and produced two changes: storing the canonical PEM, and a 64 kb
 `serverActions.bodySizeLimit`.
 
-Not done: no rate-limit test. The limiter is covered by `rate-limit.test.ts`
-and the wiring is three lines, but the wiring itself is unverified.
+The rate-limit wiring is now tested too. It could not be, at first: the
+decision sat behind `await headers()`, which only works inside a request, and
+that is the usual reason a limiter's wiring goes unchecked. Splitting the
+decision out as `allowCertificateCheckFrom(userId, address)` makes it plain
+input and plain output, following `clientAddressFrom` in `client-address.ts`.
+
+That split also settled a question the original three lines answered by
+accident. They were `a && b`, so once a student was over their own limit their
+attempts stopped counting against the address. Both counters are now always
+consulted: an attempt the student limit refuses was still an attempt from that
+address. There is a test that fails if anyone puts the short circuit back.
+
+`sign-in-limits.ts` still has the untested shape this one had, from Task 08.
