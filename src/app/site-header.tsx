@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { HOME_BY_ROLE } from "@/lib/access";
 import { signOutAction } from "./sign-out-action";
+import { ThemeToggle } from "./theme-toggle";
 
 /**
  * The strip at the top of every page: who is signed in and a way out. It
@@ -12,30 +13,33 @@ export async function SiteHeader() {
   const user = session?.user;
 
   return (
-    <header className="border-b border-neutral-200">
+    <header className="border-b border-line-soft">
       <nav
         aria-label="Account"
-        className="mx-auto flex max-w-2xl items-center justify-between gap-4 px-8 py-3 text-sm"
+        className="mx-auto w-full flex max-w-2xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-8 py-3 text-sm"
       >
         <Link href="/" className="font-semibold">
           Teacher
         </Link>
-        {user === undefined ? (
-          <Link href="/sign-in" className="underline">
-            Sign in
-          </Link>
-        ) : (
-          <div className="flex items-center gap-4">
-            <Link href={HOME_BY_ROLE[user.role]} className="underline">
-              {user.email}
+        <div className="flex items-center gap-4">
+          {user === undefined ? (
+            <Link href="/sign-in" className="underline">
+              Sign in
             </Link>
-            <form action={signOutAction}>
-              <button type="submit" className="underline">
-                Sign out
-              </button>
-            </form>
-          </div>
-        )}
+          ) : (
+            <>
+              <Link href={HOME_BY_ROLE[user.role]} className="underline">
+                {user.email}
+              </Link>
+              <form action={signOutAction}>
+                <button type="submit" className="underline">
+                  Sign out
+                </button>
+              </form>
+            </>
+          )}
+          <ThemeToggle />
+        </div>
       </nav>
     </header>
   );

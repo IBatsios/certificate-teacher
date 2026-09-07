@@ -24,7 +24,7 @@ export default async function ForbiddenPage() {
 
 function SignedOut() {
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-6 p-8">
+    <main className="mx-auto w-full flex max-w-md flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">
         That page is not for your account
       </h1>
@@ -38,7 +38,7 @@ function SignedOut() {
 
 function WrongRole({ user }: { user: CurrentUser }) {
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-6 p-8">
+    <main className="mx-auto w-full flex max-w-md flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">
         That page is not for your account
       </h1>
@@ -55,14 +55,17 @@ function WrongRole({ user }: { user: CurrentUser }) {
 
 function RoleChanged({ role }: { role: Role }) {
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-6 p-8">
+    <main className="mx-auto w-full flex max-w-md flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">Your role has changed</h1>
       <p>
         You are now {describe(role)}. Sign out and sign in again, and the pages
         for that role will open.
       </p>
       <form action={signOutAction}>
-        <button type="submit" className="rounded bg-black px-4 py-2 text-white">
+        <button
+          type="submit"
+          className="rounded bg-accent px-4 py-2 text-on-accent"
+        >
           Sign out
         </button>
       </form>

@@ -1,28 +1,98 @@
 @import "tailwindcss";
 
+/**
+ * Colour is defined once per token with `light-dark()`, not twice in a
+ * duplicated dark block. Which half applies is decided by `color-scheme`,
+ * so the toggle only has to change that one property (D68).
+ *
+ * `color-scheme` also tells the browser the page handles both themes, which
+ * stops Chrome and Brave on Android force-darkening it themselves. That
+ * automatic pass was what made the lesson pages unreadable on a phone.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light dark;
+
+  --page: light-dark(#ffffff, #0c0a09);
+  --surface: light-dark(#ffffff, #1c1917);
+  --sunken: light-dark(#fafaf9, #171412);
+
+  --strong: light-dark(#171717, #fafaf9);
+  --body: light-dark(#262626, #e7e5e4);
+  --soft: light-dark(#404040, #d6d3d1);
+  --muted: light-dark(#525252, #a8a29e);
+  --faint: light-dark(#737373, #8b8378);
+
+  --line: light-dark(#d4d4d4, #44403c);
+  --line-soft: light-dark(#e5e5e5, #292524);
+  --line-strong: light-dark(#a3a3a3, #6b6560);
+
+  /* The primary button, and the focus ring that has to be seen on both. */
+  --accent: light-dark(#171717, #fafaf9);
+  --accent-hover: light-dark(#404040, #d6d3d1);
+  --on-accent: light-dark(#ffffff, #0c0a09);
+
+  /* Notices. */
+  --notice: light-dark(#fffbeb, #2b2007);
+  --notice-line: light-dark(#fbbf24, #a16207);
+  --notice-ink: light-dark(#78350f, #fde68a);
+  --notice-ink-soft: light-dark(#b45309, #fcd34d);
+
+  /* Finished work. */
+  --done: light-dark(#ecfdf5, #052e22);
+  --done-line: light-dark(#6ee7b7, #047857);
+  --done-ink: light-dark(#064e3b, #a7f3d0);
+  --done-ink-soft: light-dark(#047857, #6ee7b7);
+  --done-ring: light-dark(#d1fae5, #064e3b);
+  --done-solid: light-dark(#059669, #10b981);
+}
+
+/* An explicit choice. `color-scheme` alone flips every token above. */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+
+  --color-strong: var(--strong);
+  --color-body: var(--body);
+  --color-soft: var(--soft);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-line-strong: var(--line-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+
+  --color-notice: var(--notice);
+  --color-notice-line: var(--notice-line);
+  --color-notice-ink: var(--notice-ink);
+  --color-notice-ink-soft: var(--notice-ink-soft);
+
+  --color-done: var(--done);
+  --color-done-line: var(--done-line);
+  --color-done-ink: var(--done-ink);
+  --color-done-ink-soft: var(--done-ink-soft);
+  --color-done-ring: var(--done-ring);
+  --color-done-solid: var(--done-solid);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--page);
+  color: var(--body);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 /* Lesson text rendered from content/lessons markdown. */
@@ -51,13 +121,15 @@ body {
 .lesson-body code {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 0.9em;
-  background: #f4f4f5;
+  background: var(--sunken);
+  border: 1px solid var(--line-soft);
   padding: 0.1em 0.35em;
   border-radius: 0.25rem;
 }
 .lesson-body pre code {
   font-size: inherit;
   background: none;
+  border: 0;
   padding: 0;
   border-radius: 0;
 }

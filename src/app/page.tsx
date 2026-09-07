@@ -9,7 +9,7 @@ export default async function Home() {
   const user = session?.user;
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-10 p-8">
+    <main className="mx-auto w-full flex max-w-2xl flex-col gap-10 p-8">
       <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-semibold">Teacher</h1>
         <p>
@@ -21,13 +21,13 @@ export default async function Home() {
           <div className="flex gap-4">
             <Link
               href="/sign-in"
-              className="rounded bg-black px-4 py-2 text-white"
+              className="rounded bg-accent px-4 py-2 text-on-accent"
             >
               Sign in
             </Link>
             <Link
               href="/sign-up"
-              className="rounded border border-black px-4 py-2"
+              className="rounded border border-accent px-4 py-2"
             >
               Create an account
             </Link>
@@ -35,7 +35,7 @@ export default async function Home() {
         ) : user.role === "admin" ? (
           <Link
             href={HOME_BY_ROLE.admin}
-            className="self-start rounded bg-black px-4 py-2 text-white"
+            className="self-start rounded bg-accent px-4 py-2 text-on-accent"
           >
             See your students
           </Link>
@@ -45,7 +45,7 @@ export default async function Home() {
       <section aria-labelledby="courses" className="flex flex-col gap-4">
         <h2
           id="courses"
-          className="text-sm font-medium tracking-wide text-neutral-600 uppercase"
+          className="text-sm font-medium tracking-wide text-muted uppercase"
         >
           Courses
         </h2>
@@ -79,33 +79,31 @@ function CourseCard({ course, role }: { course: Course; role?: Role }) {
   return (
     <article
       className={`flex flex-col gap-3 rounded border p-5 ${
-        startPath === null
-          ? "border-dashed border-neutral-300"
-          : "border-neutral-300"
+        startPath === null ? "border-dashed border-line" : "border-line"
       }`}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h3 className="text-lg font-semibold text-balance text-neutral-900">
+        <h3 className="text-lg font-semibold text-balance text-strong">
           {course.title}
         </h3>
         {startPath === null ? (
-          <p className="rounded-full border border-neutral-400 px-2 py-0.5 text-xs font-medium tracking-wide text-neutral-600 uppercase">
+          <p className="rounded-full border border-line-strong px-2 py-0.5 text-xs font-medium tracking-wide text-muted uppercase">
             Coming soon
           </p>
         ) : (
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-muted">
             {course.lessonSlugs.length} lessons and a test
           </p>
         )}
       </div>
-      <p className="text-neutral-800">{course.summary}</p>
+      <p className="text-body">{course.summary}</p>
       {start !== null && (
         <Link
           href={start.href}
           className={`self-start rounded px-4 py-2 ${
             start.filled
-              ? "bg-black text-white"
-              : "border border-black text-neutral-900"
+              ? "bg-accent text-on-accent"
+              : "border border-accent text-strong"
           }`}
         >
           {start.label}

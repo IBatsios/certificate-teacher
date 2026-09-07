@@ -10,7 +10,7 @@ export default async function SignUpPage({
   const message = messageFor(params.error);
 
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-8 p-8">
+    <main className="mx-auto w-full flex max-w-md flex-col gap-8 p-8">
       <h1 className="text-2xl font-semibold">Create an account</h1>
       <p>
         Choose a password to sign in with. If you would rather not have one, go
@@ -23,7 +23,7 @@ export default async function SignUpPage({
       {message !== undefined && (
         <p
           role="alert"
-          className="rounded border border-amber-400 bg-amber-50 p-3"
+          className="rounded border border-notice-line bg-notice p-3"
         >
           {message}
         </p>
@@ -37,7 +37,7 @@ export default async function SignUpPage({
             name="email"
             required
             autoComplete="email"
-            className="rounded border border-neutral-400 px-3 py-2"
+            className="rounded border border-line-strong px-3 py-2"
           />
         </label>
         <label className="flex flex-col gap-1">
@@ -48,12 +48,12 @@ export default async function SignUpPage({
             required
             minLength={MIN_PASSWORD_LENGTH}
             autoComplete="new-password"
-            className="rounded border border-neutral-400 px-3 py-2"
+            className="rounded border border-line-strong px-3 py-2"
           />
         </label>
         <button
           type="submit"
-          className="self-start rounded bg-black px-4 py-2 text-white"
+          className="self-start rounded bg-accent px-4 py-2 text-on-accent"
         >
           Create my account
         </button>

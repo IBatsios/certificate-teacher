@@ -42,18 +42,18 @@ export function LessonView({
   const progress = lessonProgress(lesson.steps, done);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-8 py-10">
+    <main className="mx-auto w-full flex max-w-3xl flex-col gap-10 px-8 py-10">
       <LessonHeader lesson={lesson} eyebrow={eyebrow} progress={progress} />
       {message !== undefined && (
         <p
           role="alert"
-          className="rounded border border-amber-400 bg-amber-50 p-3"
+          className="rounded border border-notice-line bg-notice p-3"
         >
           {message}
         </p>
       )}
 
-      <ol className="flex flex-col gap-12 border-l-2 border-neutral-200 [&>li]:-ml-[2px]">
+      <ol className="flex flex-col gap-12 border-l-2 border-line-soft [&>li]:-ml-[2px]">
         {lesson.steps.map((step) => (
           <li key={step.key}>
             <StepCard
@@ -92,17 +92,17 @@ function LessonHeader({
     progress.total === 0 ? 0 : (progress.done / progress.total) * 100;
   return (
     <header className="flex flex-col gap-4">
-      <p className="text-sm font-medium tracking-wide text-neutral-600 uppercase">
+      <p className="text-sm font-medium tracking-wide text-muted uppercase">
         {eyebrow}
       </p>
-      <h1 className="text-3xl font-semibold text-balance text-neutral-900">
+      <h1 className="text-3xl font-semibold text-balance text-strong">
         {lesson.title}
       </h1>
-      <div className="text-neutral-800">
+      <div className="text-body">
         <Markdown text={lesson.intro} />
       </div>
       <div className="flex flex-col gap-2" aria-live="polite">
-        <p className="text-sm text-neutral-700 tabular-nums">
+        <p className="text-sm text-soft tabular-nums">
           {progress.done} of {progress.total} steps done
         </p>
         <div
@@ -111,10 +111,10 @@ function LessonHeader({
           aria-valuemax={progress.total}
           aria-valuenow={progress.done}
           aria-label="Lesson progress"
-          className="h-2 w-full overflow-hidden rounded-full bg-neutral-200"
+          className="h-2 w-full overflow-hidden rounded-full bg-line-soft"
         >
           <div
-            className="h-full rounded-full bg-emerald-600 transition-[width] duration-300 ease-out"
+            className="h-full rounded-full bg-done-solid transition-[width] duration-300 ease-out"
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -142,15 +142,12 @@ function Finished({
   return (
     <section
       aria-labelledby="finished-title"
-      className="rounded-lg border border-emerald-300 bg-emerald-50 p-5"
+      className="rounded-lg border border-done-line bg-done p-5"
     >
-      <h2
-        id="finished-title"
-        className="text-lg font-semibold text-emerald-900"
-      >
+      <h2 id="finished-title" className="text-lg font-semibold text-done-ink">
         {finished.title}
       </h2>
-      <p className="mt-1 text-emerald-900">{finished.body}</p>
+      <p className="mt-1 text-done-ink">{finished.body}</p>
     </section>
   );
 }
@@ -163,19 +160,19 @@ function StartOver({
   return (
     <section
       aria-labelledby="start-over-title"
-      className="flex flex-col gap-3 border-t border-neutral-200 pt-8"
+      className="flex flex-col gap-3 border-t border-line-soft pt-8"
     >
       <h2 id="start-over-title" className="text-lg font-semibold">
         Start over
       </h2>
-      <p className="text-neutral-700">
+      <p className="text-soft">
         Begins a fresh run with nothing ticked. The run you are on now is kept
         and listed below, so nothing is lost.
       </p>
       <form action={startOverAction}>
         <button
           type="submit"
-          className="min-h-11 rounded border border-neutral-400 bg-white px-4 font-medium transition-[background-color,transform] duration-150 ease-out hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.97]"
+          className="min-h-11 rounded border border-line-strong bg-surface px-4 font-medium transition-[background-color,transform] duration-150 ease-out hover:bg-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.97]"
         >
           Start over
         </button>
@@ -197,12 +194,12 @@ function EarlierSessions({
   return (
     <section
       aria-labelledby="earlier-title"
-      className="flex flex-col gap-3 border-t border-neutral-200 pt-8"
+      className="flex flex-col gap-3 border-t border-line-soft pt-8"
     >
       <h2 id="earlier-title" className="text-lg font-semibold">
         Earlier sessions
       </h2>
-      <ul className="flex flex-col gap-2 text-sm text-neutral-700">
+      <ul className="flex flex-col gap-2 text-sm text-soft">
         {sessions.map((session) => (
           <li key={session.id} className="tabular-nums">
             Started {formatDate(session.startedAt)}:{" "}

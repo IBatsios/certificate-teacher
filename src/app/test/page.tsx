@@ -81,28 +81,28 @@ function QuestionForm({
   // Fresh order on every render, so clicking down one column proves nothing.
   const asked = withShuffledChoices(bank.questions);
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-8 py-10">
+    <main className="mx-auto w-full flex max-w-3xl flex-col gap-10 px-8 py-10">
       <header className="flex flex-col gap-4">
-        <p className="text-sm font-medium tracking-wide text-neutral-600 uppercase">
+        <p className="text-sm font-medium tracking-wide text-muted uppercase">
           The test
         </p>
-        <h1 className="text-3xl font-semibold text-balance text-neutral-900">
+        <h1 className="text-3xl font-semibold text-balance text-strong">
           Show what you have learned
         </h1>
-        <p className="text-neutral-800">
+        <p className="text-body">
           {bank.questions.length} questions, grouped by the four parts of the
           course. To pass you need {passMarkFor(perTopic)} of {perTopic} right
           in <em>every</em> group: knowing three parts well and one not at all
           is exactly what this is meant to catch. If you do not pass, the parts
           to go back to are named for you.
         </p>
-        <p className="text-neutral-800">
+        <p className="text-body">
           There is no limit on attempts and nothing is lost by trying.
         </p>
       </header>
 
       {unfinished.length > 0 && (
-        <p className="rounded border border-neutral-300 bg-neutral-50 p-3 text-neutral-800">
+        <p className="rounded border border-line bg-sunken p-3 text-body">
           You have not finished{" "}
           {unfinished.map((slug, index) => (
             <span key={slug}>
@@ -123,7 +123,7 @@ function QuestionForm({
       {message !== undefined && (
         <p
           role="alert"
-          className="rounded border border-amber-400 bg-amber-50 p-3"
+          className="rounded border border-notice-line bg-notice p-3"
         >
           {message}
         </p>
@@ -139,7 +139,7 @@ function QuestionForm({
         ))}
         <button
           type="submit"
-          className="min-h-11 self-start rounded bg-black px-5 font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.97]"
+          className="min-h-11 self-start rounded bg-accent px-5 font-medium text-on-accent transition-[background-color,transform] duration-150 ease-out hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.97]"
         >
           Check my answers
         </button>
@@ -162,7 +162,7 @@ function TopicSection({
     >
       <h2
         id={`topic-${topic.id}`}
-        className="border-b border-neutral-200 pb-2 text-xl font-semibold"
+        className="border-b border-line-soft pb-2 text-xl font-semibold"
       >
         {topic.title}
       </h2>
@@ -182,7 +182,7 @@ function QuestionFields({ question }: { question: Question }) {
       {question.choices.map((choice) => (
         <label
           key={choice.id}
-          className="flex items-start gap-3 rounded p-1 has-checked:bg-neutral-100"
+          className="flex items-start gap-3 rounded p-1 has-checked:bg-sunken"
         >
           <input
             type="radio"
@@ -209,34 +209,34 @@ function Result({
     bank.topics.find((topic) => topic.id === topicId)?.title ?? topicId;
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-8 px-8 py-10">
+    <main className="mx-auto w-full flex max-w-3xl flex-col gap-8 px-8 py-10">
       <section
         aria-labelledby="result-title"
         className={`rounded-lg border p-5 ${
           attempt.passed
-            ? "border-emerald-300 bg-emerald-50"
-            : "border-amber-400 bg-amber-50"
+            ? "border-done-line bg-done"
+            : "border-notice-line bg-notice"
         }`}
       >
         <h1
           id="result-title"
           className={`text-2xl font-semibold ${
-            attempt.passed ? "text-emerald-900" : "text-amber-900"
+            attempt.passed ? "text-done-ink" : "text-notice-ink"
           }`}
         >
           {attempt.passed ? "You passed" : "Not yet"}
         </h1>
-        <p className="mt-2 text-neutral-900 tabular-nums">
+        <p className="mt-2 text-strong tabular-nums">
           {attempt.correct} of {attempt.total} correct.
         </p>
         {attempt.passed ? (
-          <p className="mt-2 text-emerald-900">
+          <p className="mt-2 text-done-ink">
             You made a certificate, served it, trusted it, put a reverse proxy
             in front of it, and taught Java to accept it — and you can say why
             each of those worked. That is the whole course.
           </p>
         ) : (
-          <div className="mt-3 flex flex-col gap-2 text-amber-900">
+          <div className="mt-3 flex flex-col gap-2 text-notice-ink">
             <p>Go back to these parts, then take it again:</p>
             <ul className="flex list-disc flex-col gap-1 pl-5">
               {attempt.focusAreas.map((topicId) => (
@@ -249,7 +249,7 @@ function Result({
         )}
       </section>
 
-      <p className="text-sm text-neutral-600 tabular-nums">
+      <p className="text-sm text-muted tabular-nums">
         Recorded {attempt.createdAt.toISOString()}
       </p>
 
