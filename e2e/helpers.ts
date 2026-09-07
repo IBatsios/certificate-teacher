@@ -116,7 +116,7 @@ async function findSignInLink(email: string): Promise<string | null> {
   );
   await deleteMessage(newest.ID);
   const match = message.Text.match(
-    /https?:\/\/\S+\/api\/auth\/callback\/nodemailer\S*/,
+    /https?:\/\/\S+\/api\/auth\/callback\/(?:nodemailer|resend)\S*/,
   );
   return match === null ? null : match[0].replace(/&amp;/g, "&");
 }

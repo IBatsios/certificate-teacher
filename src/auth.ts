@@ -1,12 +1,15 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { createTransport } from "nodemailer";
 import NextAuth from "next-auth";
 import type { Adapter, AdapterUser } from "next-auth/adapters";
 import Credentials from "next-auth/providers/credentials";
+import type { EmailProviderSendVerificationRequestParams } from "next-auth/providers/email";
 import Nodemailer from "next-auth/providers/nodemailer";
 import Resend from "next-auth/providers/resend";
 import { z } from "zod";
 import { authConfig } from "@/auth.config";
 import { emailTransport } from "@/lib/env";
+import { SIGN_IN_LINK_MAX_AGE_SECONDS, signInEmail } from "@/lib/sign-in-email";
 import { verifyPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import { normalizeEmail, roleForNewUser } from "@/lib/roles";
@@ -76,10 +79,67 @@ function withRoleForNewUsers(adapter: Adapter): Adapter {
  */
 function emailProvider() {
   const from = requireEnv("EMAIL_FROM");
+  const maxAge = SIGN_IN_LINK_MAX_AGE_SECONDS;
   if (emailTransport(process.env) === "resend") {
-    return Resend({ apiKey: requireEnv("AUTH_RESEND_KEY"), from });
+    const apiKey = requireEnv("AUTH_RESEND_KEY");
+    return Resend({
+      apiKey,
+      from,
+      maxAge,
+      sendVerificationRequest: (params) => sendWithResend(params, apiKey, from),
+    });
   }
-  return Nodemailer({ server: requireEnv("EMAIL_SERVER"), from });
+  const server = requireEnv("EMAIL_SERVER");
+  return Nodemailer({
+    server,
+    from,
+    maxAge,
+    sendVerificationRequest: (params) =>
+      sendWithNodemailer(params, server, from),
+  });
+}
+
+/** The message both transports send, built from the link Auth.js minted. */
+function contentFor(params: EmailProviderSendVerificationRequestParams) {
+  return signInEmail({ url: params.url, host: new URL(params.url).host });
+}
+
+async function sendWithResend(
+  params: EmailProviderSendVerificationRequestParams,
+  apiKey: string,
+  from: string,
+): Promise<void> {
+  const { subject, text, html } = contentFor(params);
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from, to: params.identifier, subject, text, html }),
+  });
+  // Auth.js turns a throw here into the "we could not send it" message the
+  // sign-in page shows, and src/app/sign-in/actions.ts logs the reason.
+  if (!response.ok) {
+    throw new Error(
+      `Resend refused the sign-in email: ${response.status} ${await response.text()}`,
+    );
+  }
+}
+
+async function sendWithNodemailer(
+  params: EmailProviderSendVerificationRequestParams,
+  server: string,
+  from: string,
+): Promise<void> {
+  const { subject, text, html } = contentFor(params);
+  await createTransport(server).sendMail({
+    to: params.identifier,
+    from,
+    subject,
+    text,
+    html,
+  });
 }
 
 function requireEnv(
