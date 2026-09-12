@@ -22,7 +22,7 @@ const credentialsSchema = z.object({
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: withRoleForNewUsers(PrismaAdapter(prisma)),
+  adapter: withRoleForNewUsers(PrismaAdapter(asAdapterClient(prisma))),
   providers: [
     // Magic link. The adapter stores the one-time token; how the email
     // leaves the app depends on the environment (D66).
@@ -51,6 +51,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
 });
+
+/**
+ * The client this app builds, as `@auth/prisma-adapter` expects to receive it.
+ *
+ * The adapter types its argument as the `PrismaClient` exported by
+ * `@prisma/client`, which is written by the legacy `prisma-client-js`
+ * generator into `node_modules/.prisma`. This schema uses Prisma 7's
+ * `prisma-client` generator with its own output (`src/generated/prisma`), so
+ * that folder is never created and the two `PrismaClient` types differ in
+ * their type arguments while being the same client at run time.
+ *
+ * The assertion is deliberately confined to this one argument. Widening the
+ * type of `prisma` itself would lose the generated model types that every
+ * other caller in the app depends on. `Parameters<...>` is read off the
+ * adapter rather than imported, so this keeps working if the package changes
+ * where that type lives.
+ */
+function asAdapterClient(
+  client: typeof prisma,
+): Parameters<typeof PrismaAdapter>[0] {
+  return client as unknown as Parameters<typeof PrismaAdapter>[0];
+}
 
 /**
  * Users created by Auth.js (the first magic link for a new email) get their
