@@ -27,7 +27,7 @@ pnpm test
 ## Where things are
 
 - `docs/PRD.md`: what and why. `docs/ARCHITECTURE.md`: how. `docs/DECISIONS.md`: what was decided and why; append new decisions there.
-- `docs/RUNBOOK.md`: what to do next. Phase 0 is done by a person. Phase 1 is the task list.
+- `docs/RUNBOOK.md`: what to do next. Phase 0 is done by a person. Phase 1 is v1, done. Phase 2 is the Docker course, tasks 10 to 16.
 - `docs/tasks/`: one file per task. Pick any task whose "Blocked by" list is entirely done. Finish it to its acceptance criteria before starting another.
 - `docs/intake.md`: the source all of the above was generated from. Change the intake and run `/kickoff` to regenerate; edits to generated files are lost on regenerate.
 

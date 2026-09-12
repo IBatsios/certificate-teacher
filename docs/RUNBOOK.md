@@ -114,6 +114,28 @@ Pick the next task from the **frontier**: any task whose "Blocked by" list is en
 | 08 | Deploy to Railway | 01, 02 | Live at ioannisbatsios.com; migrations run on release |
 | 09 | Definition of done for v1 | every other task | The intake's definition of done, verified |
 
+## Phase 2 — the Docker course
+
+The second course, and the machinery a second course needs. Same rule as Phase
+1: pick any task whose "Blocked by" list is entirely done, finish it to its
+acceptance criteria before starting another, one branch and one pull request
+each. The plan behind this table, including why Docker replaced Kubernetes and
+why the sandbox is a fallback rather than a foundation, is in
+`docs/handoff-items/handoff-docker-course-plan.md`.
+
+| # | Task | Blocked by | Delivers |
+|---|---|---|---|
+| 10 | Multi-course foundations | none | Teacher can hold more than one course: the catalog owns its lessons, sessions and attempts are scoped to a course, Docker replaces Kubernetes as the coming course |
+| 11 | One lesson route | 10 | `/lessons/[slug]` serves every lesson; the finished panel becomes content. A refactor: no behaviour changes |
+| 12 | Docker lesson 1, what a container actually is | 10, 11 | The Docker course opens, on the hook that the student already used Docker in the deploy lesson without being told what it was |
+| 13 | Docker lesson 2, build your own image | 12 | A Dockerfile, the layer cache, tags, a multi-stage build, and the session's challenge token |
+| 14 | Docker lesson 3, run it like a real thing | 13 | Ports, volumes, environment variables, networks, non-root and health checks, ending with their own image behind their own certificate on https |
+| 15 | Verify a built image | 13, 14 | `DOCKER_CHECKS` judges a submitted `docker inspect`, storing the findings and never the raw input |
+| 16 | The Docker test phase, and the report across both courses | 12, 13, 14, 15 | A sixteen-question test for the Docker course; the admin page and export show both courses |
+
+Two migrations land in this phase, in Task 10 and Task 15. Back up the
+database before each one, in development and in production, per 0.7.
+
 ## Done
 
 v1 is done when the last task's acceptance criteria, which are the intake's definition of done, are all checked.
@@ -128,3 +150,9 @@ What to do next is in `docs/handoff-items/handoff-after-v1.md`. Do **not** run
 `/kickoff` to regenerate this file or anything in `docs/tasks/`: they have been
 edited by hand since they were generated, and a regenerate would overwrite the
 acceptance criteria, the build notes, and D51 to D64.
+
+**v2 is done** when Task 16's acceptance criteria are all checked: a student
+can work through the Docker course, have what they built checked, pass its
+test, and the admin can see both courses per student. The tasks for it, 10 to
+16, are hand-written rather than generated, which is one more reason not to run
+`/kickoff` here.
