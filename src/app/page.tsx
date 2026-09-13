@@ -2,7 +2,12 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import type { Role } from "@/generated/prisma/enums";
 import { HOME_BY_ROLE, SIGN_IN_PATH } from "@/lib/access";
-import { COURSES, courseStartPath, type Course } from "@/lib/courses";
+import {
+  COURSES,
+  courseStartPath,
+  lessonCountLabel,
+  type Course,
+} from "@/lib/courses";
 
 export default async function Home() {
   const session = await auth();
@@ -91,9 +96,7 @@ function CourseCard({ course, role }: { course: Course; role?: Role }) {
             Coming soon
           </p>
         ) : (
-          <p className="text-sm text-muted">
-            {course.lessonSlugs.length} lessons and a test
-          </p>
+          <p className="text-sm text-muted">{lessonCountLabel(course)}</p>
         )}
       </div>
       <p className="text-body">{course.summary}</p>

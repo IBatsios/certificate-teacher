@@ -93,6 +93,23 @@ describe("loadLesson for the certificates lesson", () => {
   });
 });
 
+describe("loadLesson for the containers lesson", () => {
+  test("has five steps with distinct keys, and a note that names lesson 2 without linking to it", async () => {
+    // Act
+    const lesson = await loadLesson("containers");
+
+    // Assert: the first lesson of the Docker course. Lesson 2 is not written
+    // yet, so the note says it is coming rather than pointing at a 404.
+    expect(lesson.title.length).toBeGreaterThan(0);
+    expect(lesson.steps.map((step) => step.order)).toEqual([1, 2, 3, 4, 5]);
+    expect(new Set(lesson.steps.map((step) => step.key)).size).toBe(5);
+    expect(lesson.finished?.body).toMatch(/Lesson 2/);
+    expect(lesson.finished?.body).not.toMatch(/\]\(/);
+    // Only the last lesson of a course carries the course note.
+    expect(lesson.courseFinished).toBeNull();
+  });
+});
+
 describe("loadCourseLessons", () => {
   test("loads a course's lessons in the order the catalog lists them", async () => {
     // Arrange

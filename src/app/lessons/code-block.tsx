@@ -1,11 +1,15 @@
 import { CopyButton } from "./copy-button";
 
 // The fence language in the markdown says who a block is for. Anything else
-// is shown as plain text without a copy button.
+// is shown as plain text without a copy button. `container` is a command
+// typed at a prompt inside a running container, where the shell on the
+// student's own computer is beside the point; labelled that way so a Windows
+// reader does not run `ps` or `exit` in PowerShell itself.
 const LABEL_BY_LANGUAGE: Readonly<Record<string, string>> = {
   shell: "Same command in PowerShell and Terminal",
   powershell: "Windows, in PowerShell",
   bash: "Mac or Linux, in Terminal",
+  container: "Inside the container, at the / # prompt",
   text: "What you should see",
 };
 
@@ -13,6 +17,7 @@ const COPYABLE_LANGUAGES: ReadonlySet<string> = new Set([
   "shell",
   "powershell",
   "bash",
+  "container",
 ]);
 
 export function CodeBlock({

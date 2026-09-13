@@ -1,37 +1,46 @@
 import { expect, test } from "./fixtures";
 import { signUpWithPassword, uniqueEmail } from "./helpers";
 
-const AVAILABLE_COURSE = "HTTPS with your own certificates";
+const CERTIFICATES_COURSE = "HTTPS with your own certificates";
+const DOCKER_COURSE = "Docker";
 
-test("a visitor sees what is on offer and what is still coming", async ({
+test("a visitor sees both courses and is invited to sign in for each", async ({
   page,
 }) => {
   await page.goto("/");
 
   const courses = page.getByRole("region", { name: "Courses" });
   await expect(courses.getByRole("heading", { level: 3 })).toHaveText([
-    AVAILABLE_COURSE,
-    "Docker",
+    CERTIFICATES_COURSE,
+    DOCKER_COURSE,
   ]);
 
-  // The course that exists invites them in; the one that does not says so and
-  // offers nothing to click.
-  const docker = courses.getByRole("article").filter({ hasText: "Docker" });
-  await expect(docker).toContainText("Coming soon");
-  await expect(docker.getByRole("link")).toHaveCount(0);
+  // Both courses exist now, so neither is marked as coming, each says how
+  // long it is, and each invites the visitor in.
+  await expect(courses.getByText("Coming soon")).toHaveCount(0);
+  const docker = courses
+    .getByRole("article")
+    .filter({ hasText: DOCKER_COURSE });
+  await expect(docker).toContainText(/\d+ lessons? and a test/);
   await expect(
     courses.getByRole("link", { name: "Sign in to start" }),
-  ).toBeVisible();
+  ).toHaveCount(2);
 });
 
-test("a student starts the course from the home page", async ({ page }) => {
+test("a student starts the certificates course from the home page", async ({
+  page,
+}) => {
   await signUpWithPassword(page, uniqueEmail("home"));
   // Wait for the sign-up to land, so the session cookie is set before the
   // home page is asked what this student can do.
   await expect(page).toHaveURL(/\/lessons\/certificates$/);
 
   await page.goto("/");
-  await page.getByRole("link", { name: "Go to the lesson" }).click();
+  await page
+    .getByRole("article")
+    .filter({ hasText: CERTIFICATES_COURSE })
+    .getByRole("link", { name: "Go to the lesson" })
+    .click();
 
   await expect(page).toHaveURL(/\/lessons\/certificates$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(

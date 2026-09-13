@@ -54,8 +54,10 @@ export const COURSES: ReadonlyArray<Course> = [
     title: "Docker",
     summary:
       "You have already used Docker: in the deploy lesson, one command started a whole website, and nobody told you what it did. This course does. What a container actually is, how to build an image of your own, and how to run it like a real thing, ending with your image behind your own certificate on https.",
-    status: "coming-soon",
-    lessonSlugs: [],
+    // Opened with its first lesson in Task 12. Lessons 2 and 3 are added to
+    // the end as they land, so the first stays where students found it.
+    status: "available",
+    lessonSlugs: ["containers"],
   },
 ];
 
@@ -84,6 +86,16 @@ export function lessonNumber(course: Course, slug: string): number {
     throw new Error(`The course "${course.id}" has no lesson "${slug}".`);
   }
   return index + 1;
+}
+
+/**
+ * How long a course is, as the home page says it: "2 lessons and a test".
+ * Every course ends with a test, which is the promise the home page makes
+ * above the list.
+ */
+export function lessonCountLabel(course: Course): string {
+  const count = course.lessonSlugs.length;
+  return `${count} ${count === 1 ? "lesson" : "lessons"} and a test`;
 }
 
 /** Where a course starts, or null when there is nothing to open yet. */

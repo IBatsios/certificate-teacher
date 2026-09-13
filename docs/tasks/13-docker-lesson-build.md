@@ -21,7 +21,7 @@
 
 1. Data access: the per-session challenge token. Derive it rather than store it: a keyed hash of the learning session id, in `src/lib/challenge-token.ts`, pure and tested first. Nothing new in the schema, and a token cannot outlive the session it belongs to or be guessed from another student's.
 2. Interface: the token is shown in step 6 of the lesson, with a copy button. The existing `src/app/lessons/copy-button.tsx` already does this.
-3. Content: `content/lessons/build-an-image/`, six step files, `lesson.md`, `finished.md`.
+3. Content: `content/lessons/build-an-image/`, six step files, `lesson.md`, `finished.md`. Also `content/lessons/containers/finished.md`: its last sentence says lesson 2 is being written, because a link to it would have been a 404 (D73). Make that sentence the link to this lesson.
 4. Catalog: add `build-an-image` to the Docker course's lessons.
 5. Walk every command in **PowerShell and in Terminal**, on a machine with no build cache, and record the real image sizes into the lesson text.
 6. End-to-end test at `e2e/docker-build.spec.ts`, including that the token shown is stable across a reload and changes after a start-over.
