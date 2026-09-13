@@ -95,13 +95,17 @@ test("a student works through lesson 2, and the token it shows stays the same un
   await expectProgress(page, 1);
   expect(await tokenShown(page)).toBe(token);
 
-  // Lesson 3 is not written yet, so the note names it without linking.
+  // The note leads to lesson 3, which exists since Task 14; the run journey
+  // follows it. This one goes on to start over instead.
   await tickRemainingSteps(page, 1, BUILD_STEPS);
   await expect(finished(page)).toContainText(
     "Every step of this lesson is done",
   );
   await expect(finished(page)).toContainText("Lesson 3");
-  await expect(finished(page).getByRole("link")).toHaveCount(0);
+  await expect(finished(page).getByRole("link")).toHaveAttribute(
+    "href",
+    "/lessons/run-it-properly",
+  );
 
   // Starting over begins a new session, so the token changes with it, and
   // the lesson said it would.
@@ -121,11 +125,11 @@ test("two students are shown different tokens", async ({ page, browser }) => {
   await other.context().close();
 });
 
-test("the home page counts both Docker lessons", async ({ page }) => {
+test("the home page counts all three Docker lessons", async ({ page }) => {
   await page.goto("/");
   const docker = page
     .getByRole("region", { name: "Courses" })
     .getByRole("article")
     .filter({ hasText: "Docker" });
-  await expect(docker).toContainText("2 lessons and a test");
+  await expect(docker).toContainText("3 lessons and a test");
 });

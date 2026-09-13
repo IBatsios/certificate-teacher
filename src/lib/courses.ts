@@ -54,11 +54,11 @@ export const COURSES: ReadonlyArray<Course> = [
     title: "Docker",
     summary:
       "You have already used Docker: in the deploy lesson, one command started a whole website, and nobody told you what it did. This course does. What a container actually is, how to build an image of your own, and how to run it like a real thing, ending with your image behind your own certificate on https.",
-    // Opened with its first lesson in Task 12, and lesson 2 landed in Task
-    // 13. Lesson 3 is added to the end when it lands, so the earlier ones
-    // stay where students found them.
+    // Opened with its first lesson in Task 12; lessons 2 and 3 landed in
+    // Tasks 13 and 14, each added to the end so the earlier ones stayed
+    // where students found them. Complete since Task 14.
     status: "available",
-    lessonSlugs: ["containers", "build-an-image"],
+    lessonSlugs: ["containers", "build-an-image", "run-it-properly"],
   },
 ];
 
