@@ -32,7 +32,7 @@ Bolting a second course onto that is possible and costs more later than it saves
 - [x] Vitest covers the catalog (`courseFor`, `courseById`, one owner per slug), the scoped progress, and the scoped session functions, including a fresh start on one course leaving the other course's run alone, and `findAttempt` refusing another course's attempt. 209 tests pass.
 - [x] All existing Playwright journeys pass unchanged, except the one home-page assertion that names the coming course. The suite has grown to 42 journeys since this task was written; all 42 pass, and `e2e/home-courses.spec.ts` is the only spec touched.
 - [x] The migration is committed under `prisma/migrations/20260913033328_course_scoped_sessions/`. The development database was backed up first (`backup-2026-09-12.sql`, ignored by git); the production backup was taken before this branch was started.
-- [ ] Every earlier test still passes locally. CI green on the pull request.
+- [x] Every earlier test still passes locally. CI green on pull request #24.
 - [x] No new environment variable.
 
 ## Suggested skills
