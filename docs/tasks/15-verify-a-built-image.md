@@ -55,4 +55,22 @@ Written down once, in `DOCKER_CHECKS` in `src/lib/docker-image.ts`, and rendered
 
 `docker image inspect` output is larger than a PEM. A cap well above a realistic pair of documents, around 256 KB, is right; `MAX_CERTIFICATE_BYTES` at 16 KB is not.
 
+**What Task 14 leaves running, and the shape of its image.** The lesson ends
+with `docker compose up -d` in `my-site`: the site container sits on the
+Compose network with no published port, by design (that is step 4's lesson),
+so its `NetworkSettings.Ports` is `{"8080/tcp": null}`, and the proxy is the
+one publishing `8443->443`. `port-is-published` therefore cannot be judged on
+the Compose site container. Either ask for the `docker inspect` of the
+container from step 5, which the student ran with `-p 8088:8080`, accept a
+mapping on the proxy, or judge on `Config.ExposedPorts`; decide when the data
+is in front of you and record it (D75). For the fixtures, the final image as
+built on Docker Desktop 29.7.2: `Config.User` is `nginx`,
+`Config.Healthcheck.Test` is
+`["CMD-SHELL","wget -q --spider http://127.0.0.1:8080/ || exit 1"]`,
+`Config.Env` carries `NGINX_VERSION`, `PKG_RELEASE`, `DYNPKG_RELEASE`,
+`NJS_VERSION`, and `NJS_RELEASE` from the base image and nothing else, `Size`
+is `25777301` on the containerd store (25.8 MB content size), `RepoTags` is
+`my-site:4` and `my-site:latest`, and the base image is
+`nginxinc/nginx-unprivileged:alpine`, whose own `Config.User` is `101`.
+
 **Be honest about what this proves.** The certificate check is real verification: a signature cannot be forged without the root's private key. This one is not. JSON can be typed by hand, and a determined student can pass every check without building anything. The token stops one student pasting another's work, and that is the limit of it. Write that into the decision record so that nobody later mistakes this for proof, and do not add anti-cheat machinery chasing a threat this app does not have.

@@ -57,7 +57,7 @@ describe("COURSES", () => {
     const available = withStatus("available");
 
     // Assert: the certificates course is the two lessons the test page and
-    // the admin report count, and Docker opened with its first lesson.
+    // the admin report count, and Docker is the three lessons of v2.
     expect(available.map((course) => course.id)).toEqual([
       CERTIFICATES_COURSE.id,
       "docker",
@@ -65,14 +65,18 @@ describe("COURSES", () => {
     expect(CERTIFICATES_COURSE.lessonSlugs).toEqual(["certificates", "deploy"]);
   });
 
-  test("opens the Docker course with the containers lesson, then building an image", () => {
+  test("runs the Docker course from containers, through building an image, to running it properly", () => {
     // Act
     const docker = dockerCourse();
 
-    // Assert: available from Task 12 on. Lessons land at the end as they
-    // are written, so the earlier ones stay where students found them.
+    // Assert: available from Task 12 on. Lessons landed at the end as they
+    // were written, so the earlier ones stayed where students found them.
     expect(docker.status).toBe("available");
-    expect(docker.lessonSlugs).toEqual(["containers", "build-an-image"]);
+    expect(docker.lessonSlugs).toEqual([
+      "containers",
+      "build-an-image",
+      "run-it-properly",
+    ]);
   });
 
   test("no longer announces Kubernetes", () => {
@@ -133,6 +137,7 @@ describe("courseFor", () => {
     expect(courseFor("deploy")).toBe(CERTIFICATES_COURSE);
     expect(courseFor("containers")).toBe(dockerCourse());
     expect(courseFor("build-an-image")).toBe(dockerCourse());
+    expect(courseFor("run-it-properly")).toBe(dockerCourse());
   });
 
   test("is null for a slug no course claims", () => {
@@ -164,6 +169,7 @@ describe("lessonNumber", () => {
     expect(lessonNumber(CERTIFICATES_COURSE, "deploy")).toBe(2);
     expect(lessonNumber(dockerCourse(), "containers")).toBe(1);
     expect(lessonNumber(dockerCourse(), "build-an-image")).toBe(2);
+    expect(lessonNumber(dockerCourse(), "run-it-properly")).toBe(3);
   });
 
   test("refuses a lesson the course does not claim", () => {

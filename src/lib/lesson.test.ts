@@ -113,13 +113,13 @@ describe("loadLesson for the containers lesson", () => {
 });
 
 describe("loadLesson for the build-an-image lesson", () => {
-  test("has six steps with the keys progress is stored under, and a note that names lesson 3 without linking to it", async () => {
+  test("has six steps with the keys progress is stored under, and a note that links to lesson 3", async () => {
     // Act
     const lesson = await loadLesson("build-an-image");
 
-    // Assert: the second lesson of the Docker course. Lesson 3 is not
-    // written yet, so the note says it is coming rather than pointing at a
-    // 404, as the containers note did for this lesson.
+    // Assert: the second lesson of the Docker course. Its note named
+    // lesson 3 without a link while that would have been a 404 (D73); the
+    // link arrived with the lesson, as the containers note's did.
     expect(lesson.title).toBe("Build your own image");
     expect(lesson.steps.map((step) => step.order)).toEqual([1, 2, 3, 4, 5, 6]);
     expect(lesson.steps.map((step) => step.key)).toEqual([
@@ -131,7 +131,7 @@ describe("loadLesson for the build-an-image lesson", () => {
       "sign",
     ]);
     expect(lesson.finished?.body).toMatch(/Lesson 3/);
-    expect(lesson.finished?.body).not.toMatch(/\]\(/);
+    expect(lesson.finished?.body).toContain("(/lessons/run-it-properly)");
     expect(lesson.courseFinished).toBeNull();
   });
 
@@ -152,6 +152,73 @@ describe("loadLesson for the build-an-image lesson", () => {
     expect([...names]).toEqual(["challenge-token"]);
     const signing = lesson.steps.find((step) => step.key === "sign");
     expect(placeholdersIn(signing?.body ?? "")).toEqual(["challenge-token"]);
+  });
+});
+
+describe("loadLesson for the run-it-properly lesson", () => {
+  test("has six steps with the keys progress is stored under, and notes for the lesson and for the whole course", async () => {
+    // Act
+    const lesson = await loadLesson("run-it-properly");
+
+    // Assert: the last lesson of the Docker course, so it carries both
+    // notes. The lesson one sends a student back to whichever earlier
+    // lesson is unfinished; the course one names the check and the test,
+    // which are not written yet, without linking to either (D73).
+    expect(lesson.title).toBe("Run it like a real thing");
+    expect(lesson.steps.map((step) => step.order)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(lesson.steps.map((step) => step.key)).toEqual([
+      "ports",
+      "volumes",
+      "env",
+      "networks",
+      "production",
+      "https",
+    ]);
+    expect(lesson.finished?.title).toBe("Every step of this lesson is done");
+    expect(lesson.finished?.body).toContain("(/lessons/containers)");
+    expect(lesson.finished?.body).toContain("(/lessons/build-an-image)");
+    expect(lesson.courseFinished?.title).toBe("That is the whole course");
+    expect(lesson.courseFinished?.body).toMatch(/check/);
+    expect(lesson.courseFinished?.body).toMatch(/test/);
+    expect(lesson.courseFinished?.body).not.toMatch(/\]\(/);
+  });
+
+  test("says what to do without my-certs, and links back to the steps that make it", async () => {
+    // Arrange: the last step needs the certificate from the other course.
+    const lesson = await loadLesson("run-it-properly");
+    const https = lesson.steps.find((step) => step.key === "https");
+
+    // Assert: the way back is a link to a step, not a whole lesson, and the
+    // keys it points at are the ones those lessons store progress under.
+    expect(https?.body).toContain("my-certs");
+    expect(https?.body).toContain("(/lessons/certificates#step-openssl)");
+    expect(https?.body).toContain("(/lessons/certificates#step-leaf)");
+    expect(https?.body).toContain("(/lessons/deploy#step-browser)");
+    const certificates = await loadLesson("certificates");
+    const deploy = await loadLesson("deploy");
+    expect(certificates.steps.map((step) => step.key)).toEqual(
+      expect.arrayContaining(["openssl", "leaf"]),
+    );
+    expect(deploy.steps.map((step) => step.key)).toContain("browser");
+  });
+
+  test("asks the page for the challenge token in the recipe it rewrites, and for nothing else", async () => {
+    // Arrange: the token from lesson 2 rides along on the LABEL line.
+    const lesson = await loadLesson("run-it-properly");
+    const texts = [
+      lesson.intro,
+      ...lesson.steps.map((step) => step.body),
+      lesson.finished?.body ?? "",
+      lesson.courseFinished?.body ?? "",
+    ];
+
+    // Act
+    const names = new Set(texts.flatMap((text) => placeholdersIn(text)));
+
+    // Assert
+    expect([...names]).toEqual(["challenge-token"]);
+    const production = lesson.steps.find((step) => step.key === "production");
+    expect(placeholdersIn(production?.body ?? "")).toEqual(["challenge-token"]);
   });
 });
 
