@@ -101,14 +101,13 @@ test("a student opens the Docker course from the home page, works through lesson
   await expect(step(page, FIRST_CONTAINER_STEP)).toContainText("Done");
   await expectProgress(page, 1);
 
-  // The rest survive signing out and back in. Lesson 2 is not written yet,
-  // so the note names it without linking to it.
+  // The rest survive signing out and back in. The note at the end links to
+  // lesson 2, which exists since Task 13.
   await tickRemainingSteps(page, 1, CONTAINER_STEPS);
   await expect(finished(page)).toContainText(
     "Every step of this lesson is done",
   );
   await expect(finished(page)).toContainText("Lesson 2");
-  await expect(finished(page).getByRole("link")).toHaveCount(0);
 
   await signOut(page);
   await signInWithPassword(page, email);
@@ -116,6 +115,13 @@ test("a student opens the Docker course from the home page, works through lesson
   await page.goto("/lessons/containers");
   await expectProgress(page, CONTAINER_STEPS);
   await expect(finished(page)).toBeVisible();
+
+  await finished(page).getByRole("link").click();
+  await expect(page).toHaveURL(/\/lessons\/build-an-image$/);
+  await expect(page.getByText("Lesson 2", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Build your own image",
+  );
 });
 
 test("starting over on one course leaves the other course's progress alone", async ({

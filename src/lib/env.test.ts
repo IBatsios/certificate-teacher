@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   emailTransport,
+  missingChallengeTokenVariables,
   missingEmailVariables,
   missingProductionVariables,
 } from "@/lib/env";
@@ -112,5 +113,25 @@ describe("missingEmailVariables", () => {
 
     // Act & Assert
     expect(missingEmailVariables(env)).toEqual([]);
+  });
+});
+
+describe("missingChallengeTokenVariables", () => {
+  test("names the key when it is unset, in development as much as production", () => {
+    // The Docker lesson that shows the token has no safe answer without it,
+    // so the startup check asks for it everywhere.
+    expect(missingChallengeTokenVariables({})).toEqual(["CHALLENGE_TOKEN_KEY"]);
+  });
+
+  test("treats a blank key as unset", () => {
+    expect(
+      missingChallengeTokenVariables({ CHALLENGE_TOKEN_KEY: "  " }),
+    ).toEqual(["CHALLENGE_TOKEN_KEY"]);
+  });
+
+  test("is satisfied once the key is set", () => {
+    expect(
+      missingChallengeTokenVariables({ CHALLENGE_TOKEN_KEY: "a-long-key" }),
+    ).toEqual([]);
   });
 });

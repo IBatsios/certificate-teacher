@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import { challengeTokenFor } from "@/lib/challenge-token";
 import { courseFor, lessonNumber } from "@/lib/courses";
 import { listArchivedSessions, startOrResume } from "@/lib/learning-session";
 import { loadCourseLessons, type Lesson } from "@/lib/lesson";
+import { fillLessonPlaceholders } from "@/lib/lesson-placeholders";
 import { courseProgress } from "@/lib/lesson-progress";
 import { lessonMessageFor } from "@/lib/lesson-routes";
 import { requireRole } from "@/lib/session";
@@ -31,7 +33,12 @@ export default async function LessonPage({
     startOrResume(student.id, course.id),
     listArchivedSessions(student.id, course.id),
   ]);
-  const lesson = lessonIn(lessons, slug);
+  // The one thing in a lesson that is not written ahead of time: the token
+  // a student bakes into their image, derived from this session and never
+  // stored. A lesson that does not mention it is returned unchanged.
+  const lesson = fillLessonPlaceholders(lessonIn(lessons, slug), {
+    "challenge-token": challengeTokenFor(session.id),
+  });
   const wholeCourse = courseProgress(
     lessons,
     new Set(session.doneStepKeys),

@@ -4,12 +4,15 @@ import { CopyButton } from "./copy-button";
 // is shown as plain text without a copy button. `container` is a command
 // typed at a prompt inside a running container, where the shell on the
 // student's own computer is beside the point; labelled that way so a Windows
-// reader does not run `ps` or `exit` in PowerShell itself.
+// reader does not run `ps` or `exit` in PowerShell itself. `file` is the
+// whole contents of a file the student creates in an editor, which is a
+// thing to copy but not a thing to run.
 const LABEL_BY_LANGUAGE: Readonly<Record<string, string>> = {
   shell: "Same command in PowerShell and Terminal",
   powershell: "Windows, in PowerShell",
   bash: "Mac or Linux, in Terminal",
   container: "Inside the container, at the / # prompt",
+  file: "The whole file, exactly as written",
   text: "What you should see",
 };
 
@@ -18,6 +21,7 @@ const COPYABLE_LANGUAGES: ReadonlySet<string> = new Set([
   "powershell",
   "bash",
   "container",
+  "file",
 ]);
 
 export function CodeBlock({
