@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+  CHALLENGE_TOKEN_KEY_VARIABLE,
   emailTransport,
   missingChallengeTokenVariables,
   missingEmailVariables,
@@ -121,6 +122,15 @@ describe("missingChallengeTokenVariables", () => {
     // The Docker lesson that shows the token has no safe answer without it,
     // so the startup check asks for it everywhere.
     expect(missingChallengeTokenVariables({})).toEqual(["CHALLENGE_TOKEN_KEY"]);
+  });
+
+  test("names the same variable the token derivation reads", () => {
+    // The name is defined here, not beside the derivation, so that the
+    // startup check never loads Node's crypto (D75); this pins the two to
+    // one string.
+    expect(missingChallengeTokenVariables({})).toEqual([
+      CHALLENGE_TOKEN_KEY_VARIABLE,
+    ]);
   });
 
   test("treats a blank key as unset", () => {

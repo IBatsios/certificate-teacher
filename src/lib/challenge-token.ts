@@ -1,4 +1,5 @@
 import { createHmac } from "node:crypto";
+import { CHALLENGE_TOKEN_KEY_VARIABLE } from "@/lib/env";
 
 // The token a student writes into their own image as a label, so the check
 // at the end of the Docker course can tell that the image it is reading
@@ -7,12 +8,12 @@ import { createHmac } from "node:crypto";
 // new is written to the database, a start-over changes it because the
 // session changes, and without the key nobody can work one out from a
 // session id or from another student's token. Pure: no database, no request.
+// Node only, because of the crypto import: the lesson page that calls it is
+// a server component. The name of the key's variable lives in env.ts so the
+// startup check can ask for it without loading this module (D75).
 
 /** What a token looks like: four groups of four hex digits. */
 export const CHALLENGE_TOKEN_PATTERN = /^[0-9a-f]{4}(?:-[0-9a-f]{4}){3}$/;
-
-/** The variable holding the key; a long random string, in `.env.example`. */
-export const CHALLENGE_TOKEN_KEY_VARIABLE = "CHALLENGE_TOKEN_KEY";
 
 const GROUP_LENGTH = 4;
 const GROUP_COUNT = 4;
