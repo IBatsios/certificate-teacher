@@ -34,7 +34,7 @@
 - [x] The image sizes quoted in the lesson are the sizes a person actually measured, not estimates. Docker Desktop 29.7.2 on 2026-09-13: `394MB` disk usage and `80.4MB` content size single-stage, `102MB` and `28.8MB` two-stage, `103MB` and `29.7MB` for `nginx:alpine` alone.
 - [ ] Every command has been run by a person in both PowerShell and Terminal. Every fence was run in PowerShell 7 and in Git Bash on Windows, in the lesson's order, with the lesson's exact file contents; the `.dockerignore` command and the `--format` quoting were also run in Windows PowerShell 5.1; every output the lesson quotes is what those runs printed (build notes). Still wanting a person: the same walk in Terminal on a Mac, with a browser open for the three "open <http://localhost:8088>" moments, which were checked here with `curl`.
 - [x] The end-to-end test passes: `e2e/docker-build.spec.ts`.
-- [x] Every earlier test still passes locally: 240 unit tests and 48 Playwright journeys (45 plus the three new ones) on 2026-09-13. CI green on the pull request: pending.
+- [x] Every earlier test still passes locally: 240 unit tests and 48 Playwright journeys (45 plus the three new ones) on 2026-09-13. CI green on pull request #27 (both jobs, on the feature commit and on the docs commit).
 - [x] Any new environment variable is in `.env.example` with a placeholder. `CHALLENGE_TOKEN_KEY`, with a comment saying what changing it does to students mid-course.
 
 ## Suggested skills
