@@ -6,7 +6,7 @@
 
 **Blocked by:** 10, 11.
 
-**Status:** built on `feature/docker-lesson-containers`; pull request to follow.
+**Status:** built on `feature/docker-lesson-containers`, pull request #26 open.
 
 ## The hook
 
