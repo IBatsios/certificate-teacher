@@ -6,7 +6,7 @@
 
 **Blocked by:** 13.
 
-**Status:** built on `feature/docker-lesson-run`, pull request open.
+**Status:** built on `feature/docker-lesson-run`, pull request #28 open.
 
 ## Steps of the lesson, in order
 
@@ -32,7 +32,7 @@
 - [x] Completing this lesson marks the Docker course's steps complete, and does not mark the certificates course complete or incomplete. The journey ticks one certificates step, finishes all three Docker lessons, sees the course note on lesson 3, and finds the certificates course at exactly one step done with no run set aside.
 - [ ] Every command has been run by a person in both PowerShell and Terminal, including step 6 end to end in a browser. Every fence was run in PowerShell 7 and in Git Bash on Windows, in the lesson's order, with the lesson's exact file contents, and the shell-sensitive ones (`sh -c "..."`, `-v "${PWD}:/site:ro"`, `--format '{{...}}'`) also in Windows PowerShell 5.1; every output the lesson quotes is what those runs printed (build notes). Step 6 was opened in the desktop app's browser, which confirmed the page, the protocol, and the secure context. Still wanting a person: the same walk in Terminal on a Mac, and a hand on the padlock to read `My Root` in the certificate viewer, which no tool here can click.
 - [x] The end-to-end test passes: `e2e/docker-run.spec.ts`.
-- [x] Every earlier test still passes locally: 243 unit tests and 49 Playwright journeys (48 plus the new one) on 2026-09-13. CI on the pull request: see the status line.
+- [x] Every earlier test still passes locally: 243 unit tests and 49 Playwright journeys (48 plus the new one) on 2026-09-13. CI on pull request #28: see the status line.
 
 ## Suggested skills
 
