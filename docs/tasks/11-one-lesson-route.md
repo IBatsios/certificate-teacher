@@ -26,7 +26,7 @@
 - [x] A slug no course claims is a 404, not a crash and not a lesson with no steps. `e2e/lesson-route.spec.ts` checks the student's 404, and that a visitor is still sent to sign in first, which is the proxy's rule for everything under `/lessons/`.
 - [x] All existing Playwright journeys pass **unchanged**: 42 of them, plus the new 404 journey. No existing spec was edited.
 - [x] Vitest covers the `finished.md` loading, including a lesson that has none: `parseNote`, both real lessons' notes, and a fixture lesson under `src/lib/__fixtures__/lessons/bare/` with no note at all. 216 tests pass.
-- [ ] Every earlier test still passes locally. CI green on the pull request.
+- [x] Every earlier test still passes locally. CI green on pull request #25.
 
 ## Suggested skills
 
