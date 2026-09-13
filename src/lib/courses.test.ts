@@ -5,6 +5,7 @@ import {
   courseById,
   courseFor,
   courseStartPath,
+  lessonCountLabel,
   lessonNumber,
   type Course,
   type CourseStatus,
@@ -13,6 +14,26 @@ import { loadLesson } from "@/lib/lesson";
 
 function withStatus(status: CourseStatus): ReadonlyArray<Course> {
   return COURSES.filter((course) => course.status === status);
+}
+
+/** The Docker course, which the catalog lists by id rather than exporting. */
+function dockerCourse(): Course {
+  const docker = courseById("docker");
+  if (docker === null) {
+    throw new Error("The catalog no longer lists the Docker course.");
+  }
+  return docker;
+}
+
+/** A course with this many lessons, for the label that counts them. */
+function withLessons(count: number): Course {
+  return {
+    id: "example",
+    title: "Example",
+    summary: "An example.",
+    status: "available",
+    lessonSlugs: Array.from({ length: count }, (_, i) => `lesson-${i + 1}`),
+  };
 }
 
 describe("COURSES", () => {
@@ -31,23 +52,27 @@ describe("COURSES", () => {
     }
   });
 
-  test("lists the certificates course as the one a student can start", () => {
+  test("lists both courses as ones a student can start", () => {
     // Act
     const available = withStatus("available");
 
-    // Assert: the course a student works through is the two lessons the test
-    // page and the admin report count, and the catalog is where that is said.
-    expect(available).toEqual([CERTIFICATES_COURSE]);
+    // Assert: the certificates course is the two lessons the test page and
+    // the admin report count, and Docker opened with its first lesson.
+    expect(available.map((course) => course.id)).toEqual([
+      CERTIFICATES_COURSE.id,
+      "docker",
+    ]);
     expect(CERTIFICATES_COURSE.lessonSlugs).toEqual(["certificates", "deploy"]);
   });
 
-  test("announces Docker without pretending it exists", () => {
+  test("opens the Docker course with the containers lesson", () => {
     // Act
-    const docker = courseById("docker");
+    const docker = dockerCourse();
 
-    // Assert
-    expect(docker?.status).toBe("coming-soon");
-    expect(docker?.lessonSlugs).toEqual([]);
+    // Assert: available from Task 12 on. Lessons 2 and 3 are added after
+    // it as they land, so the first stays where it is.
+    expect(docker.status).toBe("available");
+    expect(docker.lessonSlugs[0]).toBe("containers");
   });
 
   test("no longer announces Kubernetes", () => {
@@ -69,7 +94,9 @@ describe("COURSES", () => {
 
   test("gives a course lessons only once it is available", () => {
     // Assert: a course still being written links nowhere, so nothing on the
-    // home page can send a student to a lesson that has no content.
+    // home page can send a student to a lesson that has no content. Every
+    // course is available since Task 12, so the first loop guards the next
+    // course announced rather than one that exists today.
     for (const course of withStatus("coming-soon")) {
       expect(course.lessonSlugs).toEqual([]);
     }
@@ -104,6 +131,7 @@ describe("courseFor", () => {
   test("finds the course a lesson belongs to", () => {
     expect(courseFor("certificates")).toBe(CERTIFICATES_COURSE);
     expect(courseFor("deploy")).toBe(CERTIFICATES_COURSE);
+    expect(courseFor("containers")).toBe(dockerCourse());
   });
 
   test("is null for a slug no course claims", () => {
@@ -119,6 +147,7 @@ describe("courseById", () => {
     expect(courseById("https-with-your-own-certificates")).toBe(
       CERTIFICATES_COURSE,
     );
+    expect(courseById("docker")?.title).toBe("Docker");
   });
 
   test("is null for an id no course has", () => {
@@ -132,6 +161,7 @@ describe("lessonNumber", () => {
   test("counts a lesson's place in its course from one", () => {
     expect(lessonNumber(CERTIFICATES_COURSE, "certificates")).toBe(1);
     expect(lessonNumber(CERTIFICATES_COURSE, "deploy")).toBe(2);
+    expect(lessonNumber(dockerCourse(), "containers")).toBe(1);
   });
 
   test("refuses a lesson the course does not claim", () => {
@@ -140,6 +170,16 @@ describe("lessonNumber", () => {
     expect(() => lessonNumber(CERTIFICATES_COURSE, "kubernetes")).toThrow(
       /kubernetes/,
     );
+  });
+});
+
+describe("lessonCountLabel", () => {
+  test("counts a course's lessons in the singular and the plural", () => {
+    // The home page reads this out. "1 lessons and a test" is what the
+    // Docker course would have said while it had one lesson.
+    expect(lessonCountLabel(withLessons(1))).toBe("1 lesson and a test");
+    expect(lessonCountLabel(withLessons(2))).toBe("2 lessons and a test");
+    expect(lessonCountLabel(withLessons(3))).toBe("3 lessons and a test");
   });
 });
 
@@ -164,8 +204,8 @@ describe("courseStartPath", () => {
   test("points nowhere for a course that is still coming", () => {
     // Arrange
     const course: Course = {
-      id: "docker",
-      title: "Docker",
+      id: "later",
+      title: "Later",
       summary: "Later.",
       status: "coming-soon",
       lessonSlugs: [],
