@@ -1,12 +1,7 @@
-// What ticking a step, un-ticking one, and starting over do, for any lesson.
-//
-// This is deliberately not a `"use server"` module: such a module may only
-// export async functions, so it cannot export a factory. Each lesson keeps a
-// small `actions.ts` that declares the real server actions and hands its slug
-// to the functions here.
+"use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { courseFor, type Course } from "@/lib/courses";
 import {
@@ -22,22 +17,28 @@ import {
 } from "@/lib/lesson-routes";
 import { requireRole } from "@/lib/session";
 
+// The three things a student can do on a lesson page, for every lesson. The
+// page binds its slug as the first argument. A bound argument travels through
+// the browser and back, so it is treated like anything else a request
+// carries: the catalog has to claim it before anything is read or written,
+// and a slug no course claims is a 404.
+
 const MAX_STEP_KEY_LENGTH = 64;
 const stepFormSchema = z.object({
   stepKey: z.string().min(1).max(MAX_STEP_KEY_LENGTH),
 });
 
 /** Ticks a step. Redirects happen outside try/catch because `redirect` throws. */
-export async function tickStep(
+export async function markDone(
   slug: string,
   formData: FormData,
 ): Promise<void> {
+  const course = courseOf(slug);
   const student = await requireRole("student");
   const stepKey = await readStepKey(slug, formData);
   if (stepKey === null) {
     redirect(lessonPathWithMessage(slug, "unknown-step"));
   }
-  const course = courseOf(slug);
   const outcome = await trySave(slug, () =>
     markStepDone(student.id, course.id, stepKey),
   );
@@ -45,39 +46,35 @@ export async function tickStep(
 }
 
 /** Un-ticks a step. */
-export async function untickStep(
+export async function markNotDone(
   slug: string,
   formData: FormData,
 ): Promise<void> {
+  const course = courseOf(slug);
   const student = await requireRole("student");
   const stepKey = await readStepKey(slug, formData);
   if (stepKey === null) {
     redirect(lessonPathWithMessage(slug, "unknown-step"));
   }
-  const course = courseOf(slug);
   const outcome = await trySave(slug, () =>
     markStepNotDone(student.id, course.id, stepKey),
   );
   redirect(outcome ?? lessonPathAtStep(slug, stepKey));
 }
 
-/** Archives the current session and starts an empty one. */
-export async function restartSession(slug: string): Promise<void> {
-  const student = await requireRole("student");
+/** Archives the current session in the lesson's course and starts an empty one. */
+export async function startOverAction(slug: string): Promise<void> {
   const course = courseOf(slug);
+  const student = await requireRole("student");
   const outcome = await trySave(slug, () => startOver(student.id, course.id));
   redirect(outcome ?? lessonPathWithMessage(slug, "started-over"));
 }
 
-/**
- * The course the lesson belongs to. The slug is a literal in the lesson's own
- * actions module, so a slug no course claims is a mistake in code, and this
- * says so rather than saving progress against nothing.
- */
+/** The course that claims the slug. A slug none claims is a 404. */
 function courseOf(slug: string): Course {
   const course = courseFor(slug);
   if (course === null) {
-    throw new Error(`No course claims the lesson "${slug}".`);
+    notFound();
   }
   return course;
 }

@@ -118,6 +118,15 @@ body {
 .lesson-body strong {
   font-weight: 600;
 }
+.lesson-body a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* The finished note is one short paragraph inside a padded panel; the
+   paragraph margins that space lesson text out would only pad it twice. */
+.finished-note .lesson-body p {
+  margin-block: 0;
+}
 .lesson-body code {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 0.9em;

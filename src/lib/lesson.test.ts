@@ -1,5 +1,21 @@
 import { describe, expect, test } from "vitest";
-import { loadCourseLessons, loadLesson, parseStep } from "@/lib/lesson";
+import path from "node:path";
+import {
+  loadCourseLessons,
+  loadLesson,
+  parseNote,
+  parseStep,
+} from "@/lib/lesson";
+
+// Lessons written for these tests alone, so a shape the real content does not
+// have (a lesson with no finished note) can still be loaded.
+const FIXTURE_LESSONS = path.join(
+  process.cwd(),
+  "src",
+  "lib",
+  "__fixtures__",
+  "lessons",
+);
 
 describe("parseStep", () => {
   test("reads the key and title from the header and keeps the body", () => {
@@ -95,5 +111,70 @@ describe("loadCourseLessons", () => {
   test("a course with no lessons yet loads none", async () => {
     // A coming-soon course names no lesson, and asking is not an error.
     await expect(loadCourseLessons({ lessonSlugs: [] })).resolves.toEqual([]);
+  });
+});
+
+describe("parseNote", () => {
+  test("reads the title from the header and keeps the body as markdown", () => {
+    // Arrange
+    const text = `---
+title: Every step is done
+---
+
+Go to [the next one](/lessons/deploy).
+`;
+
+    // Act
+    const note = parseNote("finished.md", text);
+
+    // Assert
+    expect(note).toEqual({
+      title: "Every step is done",
+      body: "Go to [the next one](/lessons/deploy).",
+    });
+  });
+
+  test("refuses a note without a title", () => {
+    expect(() =>
+      parseNote(
+        "finished.md",
+        `Just a body.
+`,
+      ),
+    ).toThrow(/finished\.md.*title/);
+  });
+});
+
+describe("loadLesson and the finished notes", () => {
+  test("the certificates lesson says what to do next, and nothing about the course", async () => {
+    // Act
+    const lesson = await loadLesson("certificates");
+
+    // Assert: the note that was JSX on the page, now content beside the steps.
+    expect(lesson.finished?.title).toBe("Every step is done");
+    expect(lesson.finished?.body).toContain("(/lessons/deploy)");
+    expect(lesson.finished?.body).toContain("(/lessons/verify)");
+    expect(lesson.courseFinished).toBeNull();
+  });
+
+  test("the deploy lesson has a note for the lesson and one for the whole course", async () => {
+    // Act
+    const lesson = await loadLesson("deploy");
+
+    // Assert
+    expect(lesson.finished?.title).toBe("Every step of this lesson is done");
+    expect(lesson.finished?.body).toContain("(/lessons/certificates)");
+    expect(lesson.courseFinished?.title).toBe("That is the whole course");
+    expect(lesson.courseFinished?.body).toContain("(/test)");
+  });
+
+  test("a lesson with no note is valid, and has none", async () => {
+    // Act: the page then shows its plain "every step is done" line.
+    const lesson = await loadLesson("bare", FIXTURE_LESSONS);
+
+    // Assert
+    expect(lesson.steps.map((step) => step.key)).toEqual(["only"]);
+    expect(lesson.finished).toBeNull();
+    expect(lesson.courseFinished).toBeNull();
   });
 });

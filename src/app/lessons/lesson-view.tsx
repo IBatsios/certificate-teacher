@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
 import type { SessionSummary } from "@/lib/learning-session";
-import type { Lesson } from "@/lib/lesson";
+import type { FinishedNote, Lesson } from "@/lib/lesson";
 import { lessonProgress, type LessonProgress } from "@/lib/lesson-progress";
 import { Markdown } from "./markdown";
 import { StepCard, type StepState } from "./step-card";
@@ -14,8 +13,11 @@ export type LessonViewProps = Readonly<{
   eyebrow: string;
   /** Shown in an alert when a form came back with something to say. */
   message: string | undefined;
-  /** What the student reads once every step of this lesson is ticked. */
-  finished: Readonly<{ title: string; body: ReactNode }>;
+  /**
+   * What the student reads once every step of this lesson is ticked: the
+   * lesson's own note, or null for the plain "every step is done" line.
+   */
+  finished: FinishedNote | null;
   /** The lesson's own server actions; each reads the hidden `stepKey`. */
   markDone: (formData: FormData) => Promise<void>;
   markNotDone: (formData: FormData) => Promise<void>;
@@ -134,20 +136,24 @@ function stateOf(
   return stepKey === progress.nextStepKey ? "next" : "later";
 }
 
-function Finished({
-  finished,
-}: {
-  finished: Readonly<{ title: string; body: ReactNode }>;
-}) {
+/**
+ * The panel a student reads once every step is done. Its words are content,
+ * from the lesson's finished.md; a lesson without one gets the plain line.
+ */
+function Finished({ finished }: { finished: FinishedNote | null }) {
   return (
     <section
       aria-labelledby="finished-title"
       className="rounded-lg border border-done-line bg-done p-5"
     >
       <h2 id="finished-title" className="text-lg font-semibold text-done-ink">
-        {finished.title}
+        {finished === null ? "Every step is done" : finished.title}
       </h2>
-      <p className="mt-1 text-done-ink">{finished.body}</p>
+      {finished !== null && (
+        <div className="finished-note mt-1 text-done-ink">
+          <Markdown text={finished.body} />
+        </div>
+      )}
     </section>
   );
 }

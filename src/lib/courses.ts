@@ -73,6 +73,19 @@ export function courseById(id: string): Course | null {
   return COURSES.find((course) => course.id === id) ?? null;
 }
 
+/**
+ * Where a lesson sits in its course, counted from 1: the "Lesson 2" above a
+ * title. The course must claim the slug; the caller has already resolved it
+ * through `courseFor`, so anything else is a mistake in code.
+ */
+export function lessonNumber(course: Course, slug: string): number {
+  const index = course.lessonSlugs.indexOf(slug);
+  if (index === -1) {
+    throw new Error(`The course "${course.id}" has no lesson "${slug}".`);
+  }
+  return index + 1;
+}
+
 /** Where a course starts, or null when there is nothing to open yet. */
 export function courseStartPath(course: Course): string | null {
   const first = course.lessonSlugs[0];
