@@ -12,19 +12,42 @@ export type LessonStep = Readonly<{
   body: string;
 }>;
 
+/** What a student reads in the panel that appears once every step is done. */
+export type FinishedNote = Readonly<{
+  title: string;
+  /** Markdown. Links to the next lesson, the check, or the test live here. */
+  body: string;
+}>;
+
 export type Lesson = Readonly<{
   slug: string;
   title: string;
   /** Markdown shown above the steps. */
   intro: string;
   steps: ReadonlyArray<LessonStep>;
+  /**
+   * What the student reads once every step of this lesson is ticked, from
+   * `finished.md`. Null when the lesson has none; the page then shows its
+   * plain "every step is done" line.
+   */
+  finished: FinishedNote | null;
+  /**
+   * What the student reads once every step of the whole course is ticked,
+   * from `course-finished.md`. Only the last lesson of a course has a use for
+   * it. Null everywhere else, and the page shows `finished` instead.
+   */
+  courseFinished: FinishedNote | null;
 }>;
 
 // Lessons are written by the developer as markdown under content/lessons/<slug>:
-// lesson.md holds the title and intro, and every NN-*.md is one step.
+// lesson.md holds the title and intro, every NN-*.md is one step, and the
+// optional finished.md and course-finished.md are the notes a student reads
+// when they are done. Nothing about a lesson lives in code.
 const CONTENT_ROOT = path.join(process.cwd(), "content", "lessons");
 const STEP_FILE = /^(\d+)-.*\.md$/;
 const LESSON_FILE = "lesson.md";
+const FINISHED_FILE = "finished.md";
+const COURSE_FINISHED_FILE = "course-finished.md";
 // A slug is a folder name and nothing else: no separators, no dots.
 const SLUG = /^[a-z0-9-]+$/;
 
@@ -52,13 +75,29 @@ export function parseStep(fileName: string, text: string): LessonStep {
   return { order: Number(match[1]), key, title, body: content.trim() };
 }
 
-/** Reads a lesson from disk. Throws when the folder or its files are wrong. */
-export async function loadLesson(slug: string): Promise<Lesson> {
+/** Turns a finished note file into a note. Pure; exported for its tests. */
+export function parseNote(fileName: string, text: string): FinishedNote {
+  const { data, content } = matter(text);
+  const title = asText(data.title);
+  if (title === null) {
+    throw new Error(`Lesson note "${fileName}" needs a "title" in its header.`);
+  }
+  return { title, body: content.trim() };
+}
+
+/**
+ * Reads a lesson from disk. Throws when the folder or its files are wrong.
+ * `root` is where the lesson folders live; the tests point it at fixtures.
+ */
+export async function loadLesson(
+  slug: string,
+  root: string = CONTENT_ROOT,
+): Promise<Lesson> {
   if (!SLUG.test(slug)) {
     throw new Error(`Lesson slug "${slug}" is not valid.`);
   }
-  const folder = path.join(CONTENT_ROOT, slug);
-  if (path.relative(CONTENT_ROOT, folder).startsWith("..")) {
+  const folder = path.join(root, slug);
+  if (path.relative(root, folder).startsWith("..")) {
     throw new Error(`Lesson slug "${slug}" is not valid.`);
   }
   const fileNames = await listFiles(folder, slug);
@@ -78,7 +117,19 @@ export async function loadLesson(slug: string): Promise<Lesson> {
   );
   assertDistinctKeys(slug, steps);
 
-  return { slug, title, intro: content.trim(), steps };
+  const [finished, courseFinished] = await Promise.all([
+    readNote(folder, fileNames, FINISHED_FILE),
+    readNote(folder, fileNames, COURSE_FINISHED_FILE),
+  ]);
+
+  return {
+    slug,
+    title,
+    intro: content.trim(),
+    steps,
+    finished,
+    courseFinished,
+  };
 }
 
 /**
@@ -90,6 +141,21 @@ export function loadCourseLessons(
   course: Readonly<{ lessonSlugs: ReadonlyArray<string> }>,
 ): Promise<ReadonlyArray<Lesson>> {
   return Promise.all(course.lessonSlugs.map((slug) => loadLesson(slug)));
+}
+
+/** One of the optional notes, or null when the lesson has no such file. */
+async function readNote(
+  folder: string,
+  fileNames: ReadonlyArray<string>,
+  fileName: string,
+): Promise<FinishedNote | null> {
+  if (!fileNames.includes(fileName)) {
+    return null;
+  }
+  return parseNote(
+    fileName,
+    await fs.readFile(path.join(folder, fileName), "utf8"),
+  );
 }
 
 async function listFiles(folder: string, slug: string): Promise<string[]> {

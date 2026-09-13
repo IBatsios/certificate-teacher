@@ -5,6 +5,7 @@ import {
   courseById,
   courseFor,
   courseStartPath,
+  lessonNumber,
   type Course,
   type CourseStatus,
 } from "@/lib/courses";
@@ -124,6 +125,21 @@ describe("courseById", () => {
     // An id comes back out of the database as a string, and a course could be
     // retired after sessions were stored against it.
     expect(courseById("retired-course")).toBeNull();
+  });
+});
+
+describe("lessonNumber", () => {
+  test("counts a lesson's place in its course from one", () => {
+    expect(lessonNumber(CERTIFICATES_COURSE, "certificates")).toBe(1);
+    expect(lessonNumber(CERTIFICATES_COURSE, "deploy")).toBe(2);
+  });
+
+  test("refuses a lesson the course does not claim", () => {
+    // The route resolves the course from the slug first, so reaching this
+    // with a foreign slug is a bug, and a quiet 0 would hide it.
+    expect(() => lessonNumber(CERTIFICATES_COURSE, "kubernetes")).toThrow(
+      /kubernetes/,
+    );
   });
 });
 

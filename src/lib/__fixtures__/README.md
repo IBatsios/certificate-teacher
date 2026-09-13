@@ -22,3 +22,9 @@ repository, even throwaway material, trains people to ignore the warning that
 matters.
 
 To regenerate, see the commands in `docs/DECISIONS.md` under D54.
+
+## Lesson fixtures
+
+`lessons/bare/` is a lesson with one step and no `finished.md`, a shape the real
+content does not have. `loadLesson` takes an optional content root so the tests
+can load it; nothing else reads this folder.
