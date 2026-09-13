@@ -6,7 +6,7 @@
 
 **Blocked by:** 12.
 
-**Status:** built on `feature/docker-lesson-build`, pull request pending.
+**Status:** built on `feature/docker-lesson-build`, pull request #27 open.
 
 ## Steps of the lesson, in order
 
