@@ -6,6 +6,7 @@ import {
   parseNote,
   parseStep,
 } from "@/lib/lesson";
+import { placeholdersIn } from "@/lib/lesson-placeholders";
 
 // Lessons written for these tests alone, so a shape the real content does not
 // have (a lesson with no finished note) can still be loaded.
@@ -94,19 +95,63 @@ describe("loadLesson for the certificates lesson", () => {
 });
 
 describe("loadLesson for the containers lesson", () => {
-  test("has five steps with distinct keys, and a note that names lesson 2 without linking to it", async () => {
+  test("has five steps with distinct keys, and a note that links to lesson 2", async () => {
     // Act
     const lesson = await loadLesson("containers");
 
-    // Assert: the first lesson of the Docker course. Lesson 2 is not written
-    // yet, so the note says it is coming rather than pointing at a 404.
+    // Assert: the first lesson of the Docker course. Its note pointed at
+    // lesson 2 without a link while that would have been a 404 (D73); the
+    // link arrived with the lesson.
     expect(lesson.title.length).toBeGreaterThan(0);
     expect(lesson.steps.map((step) => step.order)).toEqual([1, 2, 3, 4, 5]);
     expect(new Set(lesson.steps.map((step) => step.key)).size).toBe(5);
     expect(lesson.finished?.body).toMatch(/Lesson 2/);
-    expect(lesson.finished?.body).not.toMatch(/\]\(/);
+    expect(lesson.finished?.body).toContain("(/lessons/build-an-image)");
     // Only the last lesson of a course carries the course note.
     expect(lesson.courseFinished).toBeNull();
+  });
+});
+
+describe("loadLesson for the build-an-image lesson", () => {
+  test("has six steps with the keys progress is stored under, and a note that names lesson 3 without linking to it", async () => {
+    // Act
+    const lesson = await loadLesson("build-an-image");
+
+    // Assert: the second lesson of the Docker course. Lesson 3 is not
+    // written yet, so the note says it is coming rather than pointing at a
+    // 404, as the containers note did for this lesson.
+    expect(lesson.title).toBe("Build your own image");
+    expect(lesson.steps.map((step) => step.order)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(lesson.steps.map((step) => step.key)).toEqual([
+      "dockerfile",
+      "layers",
+      "dockerignore",
+      "tags",
+      "smaller",
+      "sign",
+    ]);
+    expect(lesson.finished?.body).toMatch(/Lesson 3/);
+    expect(lesson.finished?.body).not.toMatch(/\]\(/);
+    expect(lesson.courseFinished).toBeNull();
+  });
+
+  test("asks the page for the challenge token, and for nothing else", async () => {
+    // Arrange: the page fills `{{challenge-token}}`; any other placeholder
+    // would fail at render, so the content is checked here first.
+    const lesson = await loadLesson("build-an-image");
+    const texts = [
+      lesson.intro,
+      ...lesson.steps.map((step) => step.body),
+      lesson.finished?.body ?? "",
+    ];
+
+    // Act
+    const names = new Set(texts.flatMap((text) => placeholdersIn(text)));
+
+    // Assert: shown in the signing step, and in the Dockerfile it gives.
+    expect([...names]).toEqual(["challenge-token"]);
+    const signing = lesson.steps.find((step) => step.key === "sign");
+    expect(placeholdersIn(signing?.body ?? "")).toEqual(["challenge-token"]);
   });
 });
 

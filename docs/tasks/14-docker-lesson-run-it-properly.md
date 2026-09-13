@@ -10,11 +10,11 @@
 
 ## Steps of the lesson, in order
 
-1. **Ports.** `-p 8080:80`, and the sentence that unlocks the file they wrote months ago: the left number is the computer's, the right one is the container's. `8443:443` was always this.
+1. **Ports.** `-p 8088:80`, the number lesson 2 already used (8080 is the port most often taken on a developer machine), and the sentence that unlocks the file they wrote months ago: the left number is the computer's, the right one is the container's. `8443:443` was always this.
 2. **Volumes.** Write a file inside a container, `docker rm` it, and find the file gone. Do it again with a volume and find it there. Then the bind mount, which is what `./localhost.crt:/etc/nginx/certs/localhost.crt:ro` was, and what `:ro` bought them.
 3. **Environment variables, and what never goes in an image.** `-e` at run time versus `ENV` in a Dockerfile. A password baked into an image is in the image forever, for anyone who pulls it, in a layer that deleting the file does not remove. This is the private-key lesson from the certificates course, in a second place.
 4. **Networks.** Two containers on one network reaching each other by name. This is why `proxy_pass http://backend:80` resolved: `backend` was a name Docker gave it, and nothing outside that network could use it.
-5. **Run it like production.** `USER` so it is not root, and `HEALTHCHECK` so something can tell whether it is actually working rather than merely running. Rebuild as `my-site:3`.
+5. **Run it like production.** `USER` so it is not root, and `HEALTHCHECK` so something can tell whether it is actually working rather than merely running. Rebuild as `my-site:4`; lesson 2 ended on `my-site:3`, the signed multi-stage build, with `latest` moved onto it by hand.
 6. **Put it all together, and put your certificate in front of it.** One `docker-compose.yml` that runs their image behind the nginx proxy from the deploy lesson, with `localhost.crt` and `localhost.key` bind-mounted as before. Open `https://localhost:8443` and see their own page, that they built, over https, with a padlock, behind a proxy, on a certificate they signed themselves.
 
 ## Steps, a vertical slice in this order

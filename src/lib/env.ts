@@ -1,3 +1,5 @@
+import { CHALLENGE_TOKEN_KEY_VARIABLE } from "@/lib/challenge-token";
+
 /** Which provider sends magic-link email. The names are Auth.js provider ids. */
 export type EmailTransport = "resend" | "nodemailer";
 
@@ -45,6 +47,21 @@ export function missingEmailVariables(
   return VARIABLES_BY_TRANSPORT[emailTransport(env)].filter(
     (name) => !isSet(env[name]),
   );
+}
+
+/**
+ * The variable the Docker course cannot run without: the key that every
+ * student's challenge token is derived from (`src/lib/challenge-token.ts`).
+ * Needed in every environment, development included, because the lesson
+ * page that shows the token has no safe answer without it. Returns the name
+ * when it is missing, so the startup check can say so.
+ */
+export function missingChallengeTokenVariables(
+  env: Readonly<Record<string, string | undefined>>,
+): ReadonlyArray<string> {
+  return isSet(env[CHALLENGE_TOKEN_KEY_VARIABLE])
+    ? []
+    : [CHALLENGE_TOKEN_KEY_VARIABLE];
 }
 
 function isSet(value: string | undefined): boolean {

@@ -76,8 +76,10 @@ jobs:
           node-version: 22
       - name: Install
         run: pnpm install
-      - name: Session secret for this run only
-        run: echo "AUTH_SECRET=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+      - name: Secrets for this run only
+        run: |
+          echo "AUTH_SECRET=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+          echo "CHALLENGE_TOKEN_KEY=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
       - name: Migrate
         run: pnpm prisma migrate deploy
       - name: Browser

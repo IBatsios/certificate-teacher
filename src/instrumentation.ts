@@ -1,5 +1,6 @@
 import {
   emailTransport,
+  missingChallengeTokenVariables,
   missingEmailVariables,
   missingProductionVariables,
 } from "@/lib/env";
@@ -23,6 +24,15 @@ export function register(): void {
   if (missingEmail.length > 0) {
     throw new Error(
       `Magic-link email goes out through ${emailTransport(process.env)}, so these must be set too: ${missingEmail.join(", ")}. See .env.example.`,
+    );
+  }
+
+  // The Docker course shows each student a token derived from this key.
+  // Without it every lesson page would fail on request instead of at start.
+  const missingKey = missingChallengeTokenVariables(process.env);
+  if (missingKey.length > 0) {
+    throw new Error(
+      `The Docker course signs each student's work with a token derived from ${missingKey.join(", ")}, so it must be set. See .env.example.`,
     );
   }
 }

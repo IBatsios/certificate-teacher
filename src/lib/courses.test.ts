@@ -65,14 +65,14 @@ describe("COURSES", () => {
     expect(CERTIFICATES_COURSE.lessonSlugs).toEqual(["certificates", "deploy"]);
   });
 
-  test("opens the Docker course with the containers lesson", () => {
+  test("opens the Docker course with the containers lesson, then building an image", () => {
     // Act
     const docker = dockerCourse();
 
-    // Assert: available from Task 12 on. Lessons 2 and 3 are added after
-    // it as they land, so the first stays where it is.
+    // Assert: available from Task 12 on. Lessons land at the end as they
+    // are written, so the earlier ones stay where students found them.
     expect(docker.status).toBe("available");
-    expect(docker.lessonSlugs[0]).toBe("containers");
+    expect(docker.lessonSlugs).toEqual(["containers", "build-an-image"]);
   });
 
   test("no longer announces Kubernetes", () => {
@@ -132,6 +132,7 @@ describe("courseFor", () => {
     expect(courseFor("certificates")).toBe(CERTIFICATES_COURSE);
     expect(courseFor("deploy")).toBe(CERTIFICATES_COURSE);
     expect(courseFor("containers")).toBe(dockerCourse());
+    expect(courseFor("build-an-image")).toBe(dockerCourse());
   });
 
   test("is null for a slug no course claims", () => {
@@ -162,6 +163,7 @@ describe("lessonNumber", () => {
     expect(lessonNumber(CERTIFICATES_COURSE, "certificates")).toBe(1);
     expect(lessonNumber(CERTIFICATES_COURSE, "deploy")).toBe(2);
     expect(lessonNumber(dockerCourse(), "containers")).toBe(1);
+    expect(lessonNumber(dockerCourse(), "build-an-image")).toBe(2);
   });
 
   test("refuses a lesson the course does not claim", () => {
