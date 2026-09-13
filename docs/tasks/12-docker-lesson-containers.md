@@ -40,7 +40,7 @@ Then it has them write `image:`, `ports:`, `volumes:`, and `proxy_pass http://ba
 - [ ] Every command in the lesson has been run by a person, in both PowerShell and Terminal, and the output matches what the lesson says it will be. Every `shell` fence was run in PowerShell 7 and in Git Bash on Windows against Docker Desktop 29.7.2 on 2026-09-13, and every output the lesson quotes is what those runs printed (build notes). Still wanting a person: the same walk in Terminal on a Mac, and the interactive `docker run -it alpine sh` session in a real console, which was checked with `-i` and piped input instead because the tool that ran the walk has no terminal.
 - [x] The sandbox fallback links resolve and the lesson states the session time limit. Both playground links, Docker's limits page, Docker Desktop, and Docker Hub all answered 200 on 2026-09-13; the limits quoted are from each site's own FAQ or pricing page on that day; the journey asserts the lesson says "one hour".
 - [x] The end-to-end test passes: `e2e/docker-containers.spec.ts`.
-- [ ] Every earlier test still passes locally: 218 unit tests and 45 Playwright journeys (43 plus the two new ones) on 2026-09-13. CI green on the pull request.
+- [x] Every earlier test still passes locally: 218 unit tests and 45 Playwright journeys (43 plus the two new ones) on 2026-09-13. CI green on pull request #26.
 
 ## Suggested skills
 
