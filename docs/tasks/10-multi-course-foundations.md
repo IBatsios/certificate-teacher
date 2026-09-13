@@ -6,7 +6,7 @@
 
 **Blocked by:** none. v1 is done.
 
-**Status:** built on `feature/multi-course-foundations`; pull request open, see below.
+**Status:** built on `feature/multi-course-foundations`, pull request #24 open with the migration in it. Merge deploys the migration to production on release; the production backup was taken before the branch was started.
 
 ## Why this comes first
 
@@ -29,7 +29,7 @@ Bolting a second course onto that is possible and costs more later than it saves
 
 - [x] The home page lists Docker as coming soon, links nowhere for it, and the certificates course still starts where it did. `e2e/home-courses.spec.ts` checks all three.
 - [x] A student's certificate progress, certificate submission, and test attempt from before the migration are all still attached to them and still read the same. The migration adds a column and an index and touches nothing else; the backfill was run against a scratch database holding an archived session, an active session with a ticked step, an attempt with a session, and an attempt without one, and every row came through assigned to the certificates course.
-- [x] Vitest covers the catalog (`courseFor`, `courseById`, one owner per slug), the scoped progress, and the scoped session functions, including a fresh start on one course leaving the other course's run alone. 206 tests pass.
+- [x] Vitest covers the catalog (`courseFor`, `courseById`, one owner per slug), the scoped progress, and the scoped session functions, including a fresh start on one course leaving the other course's run alone, and `findAttempt` refusing another course's attempt. 209 tests pass.
 - [x] All existing Playwright journeys pass unchanged, except the one home-page assertion that names the coming course. The suite has grown to 42 journeys since this task was written; all 42 pass, and `e2e/home-courses.spec.ts` is the only spec touched.
 - [x] The migration is committed under `prisma/migrations/20260913033328_course_scoped_sessions/`. The development database was backed up first (`backup-2026-09-12.sql`, ignored by git); the production backup was taken before this branch was started.
 - [ ] Every earlier test still passes locally. CI green on the pull request.
