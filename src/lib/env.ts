@@ -1,7 +1,21 @@
-import { CHALLENGE_TOKEN_KEY_VARIABLE } from "@/lib/challenge-token";
+// Which variables the app needs, and what it needs them for. Pure: it reads
+// the record it is given, never process.env, and it imports nothing from
+// Node. That last part matters because src/instrumentation.ts runs the
+// checks below at startup and Next compiles it for the Edge runtime as well
+// as for Node, so anything reachable from here has to load there too (D75).
+// src/instrumentation.test.ts walks the imports to keep it that way.
 
 /** Which provider sends magic-link email. The names are Auth.js provider ids. */
 export type EmailTransport = "resend" | "nodemailer";
+
+/**
+ * The variable holding the key every student's challenge token is derived
+ * from; a long random string, in `.env.example`. Named here rather than in
+ * `src/lib/challenge-token.ts`, which derives the tokens and needs Node's
+ * crypto for it, so the startup check can ask for the key without pulling
+ * crypto into the Edge bundle.
+ */
+export const CHALLENGE_TOKEN_KEY_VARIABLE = "CHALLENGE_TOKEN_KEY";
 
 // What each transport needs besides the variable that selects it.
 const VARIABLES_BY_TRANSPORT: Readonly<
