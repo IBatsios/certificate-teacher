@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import { listArchivedSessions, startOrResume } from "@/lib/learning-session";
-import { loadLesson } from "@/lib/lesson";
+import { loadCourseLessons, type Lesson } from "@/lib/lesson";
 import { courseProgress } from "@/lib/lesson-progress";
 import { lessonMessageFor, lessonPath } from "@/lib/lesson-routes";
 import { VERIFY_PATH } from "../verify/messages";
@@ -55,16 +56,13 @@ export default async function DeployLessonPage({
 }: PageProps<"/lessons/deploy">) {
   const student = await requireRole("student");
   const params = await searchParams;
-  const [firstLesson, lesson, session, earlier] = await Promise.all([
-    loadLesson(FIRST_LESSON_SLUG),
-    loadLesson(LESSON_SLUG),
-    startOrResume(student.id),
-    listArchivedSessions(student.id),
+  const [lessons, session, earlier] = await Promise.all([
+    loadCourseLessons(CERTIFICATES_COURSE),
+    startOrResume(student.id, CERTIFICATES_COURSE.id),
+    listArchivedSessions(student.id, CERTIFICATES_COURSE.id),
   ]);
-  const course = courseProgress(
-    [firstLesson, lesson],
-    new Set(session.doneStepKeys),
-  );
+  const lesson = lessonIn(lessons, LESSON_SLUG);
+  const course = courseProgress(lessons, new Set(session.doneStepKeys));
 
   return (
     <LessonView
@@ -79,4 +77,17 @@ export default async function DeployLessonPage({
       startOverAction={startOverAction}
     />
   );
+}
+
+/**
+ * This page's lesson, out of the course's lessons. The catalog says which
+ * lessons the course is made of, and this page is one of them; a mismatch is
+ * a mistake in code, not something a student can cause.
+ */
+function lessonIn(lessons: ReadonlyArray<Lesson>, slug: string): Lesson {
+  const lesson = lessons.find((candidate) => candidate.slug === slug);
+  if (lesson === undefined) {
+    throw new Error(`The "${slug}" lesson is not in the certificates course.`);
+  }
+  return lesson;
 }

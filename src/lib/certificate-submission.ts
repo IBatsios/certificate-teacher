@@ -5,6 +5,7 @@ import type {
   CertificateReport,
   ParsedCertificate,
 } from "@/lib/certificate";
+import { activeSessionId, findActiveSessionId } from "@/lib/learning-session";
 import { prisma } from "@/lib/prisma";
 
 export type SubmissionSummary = Readonly<{
@@ -39,13 +40,14 @@ const SERIALIZABLE = {
 const PRIVATE_KEY_LABEL = /-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----/;
 
 /**
- * Stores one verdict against the student's active session, creating the
- * session when they have none. Finding the session and writing the submission
- * share a transaction, so a "start over" from another tab cannot leave the
- * submission on the session that was just archived.
+ * Stores one verdict against the student's active session in the course,
+ * creating the session when they have none. Finding the session and writing
+ * the submission share a transaction, so a "start over" from another tab
+ * cannot leave the submission on the session that was just archived.
  */
 export async function saveSubmission(
   userId: string,
+  courseId: string,
   certificate: ParsedCertificate,
   report: CertificateReport,
 ): Promise<SubmissionSummary> {
@@ -55,10 +57,10 @@ export async function saveSubmission(
     );
   }
   return prisma.$transaction(async (tx) => {
-    const session = await activeSessionId(tx, userId);
+    const sessionId = await activeSessionId(tx, userId, courseId);
     const row = await tx.certificateSubmission.create({
       data: {
-        sessionId: session,
+        sessionId,
         certificatePem: certificate.pem,
         subject: certificate.subject,
         issuer: certificate.issuer,
@@ -73,43 +75,21 @@ export async function saveSubmission(
   }, SERIALIZABLE);
 }
 
-/** The submissions in the student's active session, newest first. */
+/** The submissions in the student's active session in the course, newest first. */
 export async function listSubmissions(
   userId: string,
+  courseId: string,
 ): Promise<ReadonlyArray<SubmissionSummary>> {
-  const session = await prisma.learningSession.findFirst({
-    where: { userId, status: "active" },
-    select: { id: true },
-    orderBy: [{ startedAt: "desc" }, { id: "desc" }],
-  });
-  if (session === null) {
+  const sessionId = await findActiveSessionId(userId, courseId);
+  if (sessionId === null) {
     return [];
   }
   const rows = await prisma.certificateSubmission.findMany({
-    where: { sessionId: session.id },
+    where: { sessionId },
     select: SUMMARY_SELECT,
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
   return rows.map(toSummary);
-}
-
-async function activeSessionId(
-  tx: Prisma.TransactionClient,
-  userId: string,
-): Promise<string> {
-  const active = await tx.learningSession.findFirst({
-    where: { userId, status: "active" },
-    select: { id: true },
-    orderBy: [{ startedAt: "desc" }, { id: "desc" }],
-  });
-  if (active !== null) {
-    return active.id;
-  }
-  const created = await tx.learningSession.create({
-    data: { userId },
-    select: { id: true },
-  });
-  return created.id;
 }
 
 function toSummary(

@@ -28,11 +28,13 @@ export type CourseProgress = Readonly<{
 }>;
 
 /**
- * How far a set of done step keys gets through every lesson together. This is
- * what "the student finished" means: the certificates lesson and the deploy
- * lesson, not either one alone. Keys that no lesson uses any more are ignored,
- * so retiring a step from the content cannot leave a session over-counted.
- * Pure.
+ * How far a set of done step keys gets through the lessons of one course,
+ * taken together. This is what "the student finished" means: every step of
+ * every lesson the course is made of, not any one lesson alone. The caller
+ * passes one course's lessons, from the catalog, never every lesson Teacher
+ * has: a second course's steps must not count towards the first. Keys that no
+ * lesson uses any more are ignored, so retiring a step from the content cannot
+ * leave a session over-counted. Pure.
  */
 export function courseProgress(
   lessons: ReadonlyArray<

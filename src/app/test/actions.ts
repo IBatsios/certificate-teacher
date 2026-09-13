@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import { loadQuestionBank, type Question } from "@/lib/questions";
 import { score, type Answer } from "@/lib/score";
 import { requireRole } from "@/lib/session";
@@ -28,7 +29,9 @@ export async function submitTestAttempt(formData: FormData): Promise<void> {
 
   let attemptId: string | null = null;
   try {
-    attemptId = (await recordAttempt(student.id, result)).id;
+    attemptId = (
+      await recordAttempt(student.id, CERTIFICATES_COURSE.id, result)
+    ).id;
   } catch (error) {
     console.error("Could not save the test attempt", error);
   }

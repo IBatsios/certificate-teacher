@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { loadLesson, parseStep } from "@/lib/lesson";
+import { loadCourseLessons, loadLesson, parseStep } from "@/lib/lesson";
 
 describe("parseStep", () => {
   test("reads the key and title from the header and keeps the body", () => {
@@ -74,5 +74,26 @@ describe("loadLesson for the certificates lesson", () => {
 
     // Assert
     await expect(load).rejects.toThrow(/no-such-lesson/);
+  });
+});
+
+describe("loadCourseLessons", () => {
+  test("loads a course's lessons in the order the catalog lists them", async () => {
+    // Arrange
+    const course = { lessonSlugs: ["deploy", "certificates"] };
+
+    // Act
+    const lessons = await loadCourseLessons(course);
+
+    // Assert
+    expect(lessons.map((lesson) => lesson.slug)).toEqual([
+      "deploy",
+      "certificates",
+    ]);
+  });
+
+  test("a course with no lessons yet loads none", async () => {
+    // A coming-soon course names no lesson, and asking is not an error.
+    await expect(loadCourseLessons({ lessonSlugs: [] })).resolves.toEqual([]);
   });
 });

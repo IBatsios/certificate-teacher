@@ -10,6 +10,7 @@ import {
 } from "@/lib/certificate";
 import { allowCertificateCheck } from "@/lib/certificate-limits";
 import { saveSubmission } from "@/lib/certificate-submission";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import { requireRole } from "@/lib/session";
 import {
   VERIFY_PATH,
@@ -52,7 +53,12 @@ export async function checkSubmission(formData: FormData): Promise<void> {
 
   let saved = true;
   try {
-    await saveSubmission(student.id, leaf.certificate, report);
+    await saveSubmission(
+      student.id,
+      CERTIFICATES_COURSE.id,
+      leaf.certificate,
+      report,
+    );
     revalidatePath(VERIFY_PATH);
   } catch (error) {
     console.error("Could not save a certificate submission", error);

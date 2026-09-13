@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "vitest";
 import { buildReport, toCsv, type StudentReportRow } from "@/lib/admin-report";
 import { checkCertificate, parseCertificate } from "@/lib/certificate";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import { saveSubmission } from "@/lib/certificate-submission";
 import { markStepDone, startOver } from "@/lib/learning-session";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +12,8 @@ import path from "node:path";
 const FIXTURES = path.join(process.cwd(), "src", "lib", "__fixtures__");
 const goodLeaf = readFileSync(path.join(FIXTURES, "good-leaf.crt"), "utf8");
 const goodRoot = readFileSync(path.join(FIXTURES, "good-root.crt"), "utf8");
+
+const COURSE = CERTIFICATES_COURSE.id;
 
 async function newStudent(email?: string): Promise<string> {
   const salt = Math.random().toString(36).slice(2, 10);
@@ -58,8 +61,8 @@ describe("buildReport", () => {
 
   test("counts the lesson steps they have ticked", async () => {
     const userId = await newStudent();
-    await markStepDone(userId, "chain");
-    await markStepDone(userId, "root");
+    await markStepDone(userId, COURSE, "chain");
+    await markStepDone(userId, COURSE, "root");
 
     const row = await rowFor(userId);
 
@@ -74,6 +77,7 @@ describe("buildReport", () => {
     if (!parsed.ok) throw new Error("fixture did not parse");
     await saveSubmission(
       userId,
+      COURSE,
       parsed.certificate,
       checkCertificate(goodLeaf, goodRoot),
     );
@@ -89,7 +93,7 @@ describe("buildReport", () => {
   test("shows the latest test result with its focus areas named", async () => {
     // Arrange
     const userId = await newStudent();
-    await recordAttempt(userId, {
+    await recordAttempt(userId, COURSE, {
       passed: false,
       correct: 9,
       total: 16,
@@ -110,14 +114,14 @@ describe("buildReport", () => {
 
   test("only the newest attempt counts", async () => {
     const userId = await newStudent();
-    await recordAttempt(userId, {
+    await recordAttempt(userId, COURSE, {
       passed: false,
       correct: 4,
       total: 16,
       topics: [],
       focusAreas: ["java"],
     });
-    await recordAttempt(userId, {
+    await recordAttempt(userId, COURSE, {
       passed: true,
       correct: 16,
       total: 16,
@@ -135,8 +139,8 @@ describe("buildReport", () => {
   test("starting over empties the row, without deleting what came before", async () => {
     // Arrange
     const userId = await newStudent();
-    await markStepDone(userId, "chain");
-    await recordAttempt(userId, {
+    await markStepDone(userId, COURSE, "chain");
+    await recordAttempt(userId, COURSE, {
       passed: true,
       correct: 16,
       total: 16,
@@ -145,13 +149,34 @@ describe("buildReport", () => {
     });
 
     // Act
-    await startOver(userId);
+    await startOver(userId, COURSE);
 
     // Assert
     const row = await rowFor(userId);
     expect(row.stepsDone).toBe(0);
     expect(row.testPassed).toBeNull();
     expect(await prisma.testAttempt.count({ where: { userId } })).toBe(1);
+  });
+
+  test("follows the student's run in the certificates course, not another course's", async () => {
+    // Arrange: until Task 16 the report is the certificates course only, so
+    // progress and results in another course must not show up in its columns.
+    const userId = await newStudent();
+    await markStepDone(userId, "another-course", "chain");
+    await recordAttempt(userId, "another-course", {
+      passed: true,
+      correct: 16,
+      total: 16,
+      topics: [],
+      focusAreas: [],
+    });
+
+    // Act
+    const row = await rowFor(userId);
+
+    // Assert
+    expect(row.stepsDone).toBe(0);
+    expect(row.testPassed).toBeNull();
   });
 
   test("the admin is not listed as a student", async () => {
