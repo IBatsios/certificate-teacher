@@ -6,7 +6,7 @@
 
 **Blocked by:** none. v1 is done.
 
-**Status:** not started.
+**Status:** built on `feature/multi-course-foundations`, pull request #24 open with the migration in it. Merge deploys the migration to production on release; the production backup was taken before the branch was started.
 
 ## Why this comes first
 
@@ -27,13 +27,13 @@ Bolting a second course onto that is possible and costs more later than it saves
 
 ## Acceptance criteria
 
-- [ ] The home page lists Docker as coming soon, links nowhere for it, and the certificates course still starts where it did.
-- [ ] A student's certificate progress, certificate submission, and test attempt from before the migration are all still attached to them and still read the same.
-- [ ] Vitest covers the catalog, the scoped progress, and the scoped session functions as a caller would observe them, and passes.
-- [ ] All 35 existing Playwright journeys pass unchanged, except the one home-page assertion that names the coming course.
-- [ ] The migration is committed under `prisma/migrations/`. The database was backed up first, in development and in production.
-- [ ] Every earlier test still passes locally. CI green on the pull request.
-- [ ] Any new environment variable is in `.env.example` with a placeholder.
+- [x] The home page lists Docker as coming soon, links nowhere for it, and the certificates course still starts where it did. `e2e/home-courses.spec.ts` checks all three.
+- [x] A student's certificate progress, certificate submission, and test attempt from before the migration are all still attached to them and still read the same. The migration adds a column and an index and touches nothing else; the backfill was run against a scratch database holding an archived session, an active session with a ticked step, an attempt with a session, and an attempt without one, and every row came through assigned to the certificates course.
+- [x] Vitest covers the catalog (`courseFor`, `courseById`, one owner per slug), the scoped progress, and the scoped session functions, including a fresh start on one course leaving the other course's run alone, and `findAttempt` refusing another course's attempt. 209 tests pass.
+- [x] All existing Playwright journeys pass unchanged, except the one home-page assertion that names the coming course. The suite has grown to 42 journeys since this task was written; all 42 pass, and `e2e/home-courses.spec.ts` is the only spec touched.
+- [x] The migration is committed under `prisma/migrations/20260913033328_course_scoped_sessions/`. The development database was backed up first (`backup-2026-09-12.sql`, ignored by git); the production backup was taken before this branch was started.
+- [x] Every earlier test still passes locally. CI green on pull request #24.
+- [x] No new environment variable.
 
 ## Suggested skills
 
@@ -47,3 +47,31 @@ Bolting a second course onto that is possible and costs more later than it saves
 The migration is the risk. There is no staging environment (RUNBOOK 0.7), the production database has real student rows, and a non-null column added to a populated table fails unless the backfill runs first. Write the backfill into the migration by hand rather than trusting the generated SQL, and read it before running it.
 
 `StepProgress` needs no course column. Its keys are unique per session and a session now belongs to one course, so a step key can never be counted against the wrong course. Leave it alone.
+
+## Build notes
+
+- The catalog exports `CERTIFICATES_COURSE` on its own, and every caller that
+  today knows which course it is in (both lesson pages, verify, the test, the
+  admin report) imports that. `courseFor(slug)` is used where the slug is the
+  input, in `src/app/lessons/lesson-actions.ts`; Task 11's route will use it
+  the same way. `courseById(id)` has no caller yet; Task 16 needs it to turn a
+  stored id back into a course.
+- `courseProgress` kept its signature. The scoping is in what the caller
+  passes, and `loadCourseLessons(course)` in `src/lib/lesson.ts` is the one
+  way to get it, replacing three copies of mapping slugs to `loadLesson`.
+- The three private copies of "find or create the active session" in the
+  session, submission, and attempt modules collapsed into `activeSessionId`
+  (inside a transaction, creates) and `findActiveSessionId` (outside, reads
+  only), both exported from `src/lib/learning-session.ts`.
+- The deploy page loads the course's lessons once and picks its own out of
+  them, instead of naming the first lesson's slug a second time.
+- The migration was hand-written, not generated: `prisma migrate dev` refuses
+  a required column on a populated table, and the backfill has to sit between
+  adding the column and making it required. `prisma migrate diff` reports no
+  drift between the applied database and the schema. Prisma applies a
+  migration to PostgreSQL inside one transaction, so a failure part-way leaves
+  the table as it was.
+- The security review asked for `findAttempt` to be scoped by course as well
+  as by student, so that once a second course records attempts the test
+  result page cannot render another course's attempt against this course's
+  topic titles. Done here rather than left for Task 16.

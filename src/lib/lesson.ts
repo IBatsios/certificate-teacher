@@ -81,6 +81,17 @@ export async function loadLesson(slug: string): Promise<Lesson> {
   return { slug, title, intro: content.trim(), steps };
 }
 
+/**
+ * Every lesson of a course, in the order the catalog lists them. A course that
+ * names no lesson yet loads none, which is not an error: the catalog lists a
+ * coming course before its content exists.
+ */
+export function loadCourseLessons(
+  course: Readonly<{ lessonSlugs: ReadonlyArray<string> }>,
+): Promise<ReadonlyArray<Lesson>> {
+  return Promise.all(course.lessonSlugs.map((slug) => loadLesson(slug)));
+}
+
 async function listFiles(folder: string, slug: string): Promise<string[]> {
   try {
     return await fs.readdir(folder);

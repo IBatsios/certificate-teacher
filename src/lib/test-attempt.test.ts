@@ -1,12 +1,15 @@
 import { afterEach, describe, expect, test } from "vitest";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import { startOrResume, startOver } from "@/lib/learning-session";
 import { prisma } from "@/lib/prisma";
 import type { ScoreResult } from "@/lib/score";
-import { listAttempts, recordAttempt } from "@/lib/test-attempt";
+import { findAttempt, listAttempts, recordAttempt } from "@/lib/test-attempt";
 
 // Against the development database, like the other data-access tests. Each
 // test makes its own user; the cleanup removes only this file's users, which
 // cascades to their sessions and attempts.
+
+const COURSE = CERTIFICATES_COURSE.id;
 
 async function newStudent(): Promise<string> {
   const salt = Math.random().toString(36).slice(2, 10);
@@ -49,7 +52,7 @@ describe("recordAttempt", () => {
     const userId = await newStudent();
 
     // Act
-    const attempt = await recordAttempt(userId, passing());
+    const attempt = await recordAttempt(userId, COURSE, passing());
 
     // Assert
     expect(attempt.passed).toBe(true);
@@ -58,10 +61,32 @@ describe("recordAttempt", () => {
     expect(attempt.focusAreas).toEqual([]);
   });
 
+  test("writes down which course's test it was, on the attempt itself", async () => {
+    // Arrange: the report across courses reads the course off the attempt,
+    // not through the session, so an attempt with no session still says.
+    const userId = await newStudent();
+
+    // Act
+    const attempt = await recordAttempt(userId, "another-course", passing());
+
+    // Assert
+    expect(attempt.courseId).toBe("another-course");
+    const row = await prisma.testAttempt.findUniqueOrThrow({
+      where: { id: attempt.id },
+      select: { courseId: true, session: { select: { courseId: true } } },
+    });
+    expect(row.courseId).toBe("another-course");
+    expect(row.session?.courseId).toBe("another-course");
+  });
+
   test("keeps the focus areas of a failed attempt", async () => {
     const userId = await newStudent();
 
-    const attempt = await recordAttempt(userId, failing(["proxy", "java"]));
+    const attempt = await recordAttempt(
+      userId,
+      COURSE,
+      failing(["proxy", "java"]),
+    );
 
     expect(attempt.passed).toBe(false);
     expect(attempt.focusAreas).toEqual(["proxy", "java"]);
@@ -70,10 +95,10 @@ describe("recordAttempt", () => {
   test("attaches the attempt to the student's active session", async () => {
     // Arrange
     const userId = await newStudent();
-    const session = await startOrResume(userId);
+    const session = await startOrResume(userId, COURSE);
 
     // Act
-    await recordAttempt(userId, passing());
+    await recordAttempt(userId, COURSE, passing());
 
     // Assert
     const rows = await prisma.testAttempt.findMany({
@@ -85,7 +110,7 @@ describe("recordAttempt", () => {
   test("a student with no session yet gets one", async () => {
     const userId = await newStudent();
 
-    const attempt = await recordAttempt(userId, passing());
+    const attempt = await recordAttempt(userId, COURSE, passing());
 
     expect(attempt.id).toBeTruthy();
     const rows = await prisma.testAttempt.findMany({ where: { userId } });
@@ -97,17 +122,17 @@ describe("listAttempts", () => {
   test("a student who has not taken it has none", async () => {
     const userId = await newStudent();
 
-    expect(await listAttempts(userId)).toEqual([]);
+    expect(await listAttempts(userId, COURSE)).toEqual([]);
   });
 
   test("newest first", async () => {
     // Arrange
     const userId = await newStudent();
-    await recordAttempt(userId, failing(["java"]));
-    await recordAttempt(userId, passing());
+    await recordAttempt(userId, COURSE, failing(["java"]));
+    await recordAttempt(userId, COURSE, passing());
 
     // Act
-    const attempts = await listAttempts(userId);
+    const attempts = await listAttempts(userId, COURSE);
 
     // Assert
     expect(attempts).toHaveLength(2);
@@ -115,16 +140,69 @@ describe("listAttempts", () => {
     expect(attempts[1]?.passed).toBe(false);
   });
 
+  test("an attempt in one course is not listed for another", async () => {
+    // Arrange
+    const userId = await newStudent();
+    await recordAttempt(userId, "another-course", passing());
+
+    // Act
+    const here = await listAttempts(userId, COURSE);
+
+    // Assert
+    expect(here).toEqual([]);
+    expect(await listAttempts(userId, "another-course")).toHaveLength(1);
+  });
+
   test("starting over leaves the earlier attempts behind, without deleting them", async () => {
     // Arrange
     const userId = await newStudent();
-    await recordAttempt(userId, passing());
+    await recordAttempt(userId, COURSE, passing());
 
     // Act
-    await startOver(userId);
+    await startOver(userId, COURSE);
 
     // Assert
-    expect(await listAttempts(userId)).toEqual([]);
+    expect(await listAttempts(userId, COURSE)).toEqual([]);
     expect(await prisma.testAttempt.count({ where: { userId } })).toBe(1);
+  });
+});
+
+describe("findAttempt", () => {
+  test("finds the student's own attempt in the course", async () => {
+    // Arrange
+    const userId = await newStudent();
+    const recorded = await recordAttempt(userId, COURSE, passing());
+
+    // Act
+    const found = await findAttempt(userId, COURSE, recorded.id);
+
+    // Assert
+    expect(found?.id).toBe(recorded.id);
+  });
+
+  test("is null for another student's attempt", async () => {
+    // Arrange
+    const alice = await newStudent();
+    const bob = await newStudent();
+    const recorded = await recordAttempt(alice, COURSE, passing());
+
+    // Act
+    const found = await findAttempt(bob, COURSE, recorded.id);
+
+    // Assert
+    expect(found).toBeNull();
+  });
+
+  test("is null for an attempt at another course's test", async () => {
+    // Arrange: the result page reads the focus areas against the course's
+    // own topics, so an attempt from another course must not be shown there.
+    const userId = await newStudent();
+    const recorded = await recordAttempt(userId, "another-course", passing());
+
+    // Act
+    const found = await findAttempt(userId, COURSE, recorded.id);
+
+    // Assert
+    expect(found).toBeNull();
   });
 });

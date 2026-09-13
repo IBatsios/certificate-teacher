@@ -11,16 +11,14 @@ test("a visitor sees what is on offer and what is still coming", async ({
   const courses = page.getByRole("region", { name: "Courses" });
   await expect(courses.getByRole("heading", { level: 3 })).toHaveText([
     AVAILABLE_COURSE,
-    "Kubernetes",
+    "Docker",
   ]);
 
   // The course that exists invites them in; the one that does not says so and
   // offers nothing to click.
-  const kubernetes = courses
-    .getByRole("article")
-    .filter({ hasText: "Kubernetes" });
-  await expect(kubernetes).toContainText("Coming soon");
-  await expect(kubernetes.getByRole("link")).toHaveCount(0);
+  const docker = courses.getByRole("article").filter({ hasText: "Docker" });
+  await expect(docker).toContainText("Coming soon");
+  await expect(docker.getByRole("link")).toHaveCount(0);
   await expect(
     courses.getByRole("link", { name: "Sign in to start" }),
   ).toBeVisible();

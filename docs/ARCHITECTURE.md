@@ -45,8 +45,8 @@ erDiagram
 ```
 
 - **User**: from sign-in. Email, hashed password when set, role (student or admin). Holds the personal details named in `data.sensitive`.
-- **LearningSession**: the "session" of 5.1, named to avoid a clash with the Auth.js `Session` model. Belongs to a User; when it started; which lesson steps are done; whether it is the active session or an archived one. Rule from 5.2: a student's progress, once saved, is never lost or wrong. Rule from 5.3: recoverable, and "start over" creates a new active session while the old one stays recoverable.
-- **TestAttempt**: implied by 4.4 and 14.1. Belongs to a User and a LearningSession; pass or fail; the focus areas where the student fell short; when taken.
+- **LearningSession**: the "session" of 5.1, named to avoid a clash with the Auth.js `Session` model. Belongs to a User and to one course, by the course id in `src/lib/courses.ts` (D71); when it started; which lesson steps are done; whether it is the active session or an archived one. Rule from 5.2: a student's progress, once saved, is never lost or wrong. Rule from 5.3: recoverable, and "start over" creates a new active session while the old one stays recoverable.
+- **TestAttempt**: implied by 4.4 and 14.1. Belongs to a User and a LearningSession, and says which course's test it was; pass or fail; the focus areas where the student fell short; when taken.
 - **CertificateSubmission**: implied by 7.2 ("might need"). Belongs to a LearningSession; the uploaded certificate, what was parsed from it, and the verdict. Never holds a private key.
 
 Fields beyond these are not specified.

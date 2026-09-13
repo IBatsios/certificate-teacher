@@ -1,12 +1,14 @@
 import { describe, expect, test } from "vitest";
 import {
+  CERTIFICATES_COURSE,
   COURSES,
+  courseById,
+  courseFor,
   courseStartPath,
   type Course,
   type CourseStatus,
 } from "@/lib/courses";
 import { loadLesson } from "@/lib/lesson";
-import { COURSE_SLUGS } from "@/lib/lesson-routes";
 
 function withStatus(status: CourseStatus): ReadonlyArray<Course> {
   return COURSES.filter((course) => course.status === status);
@@ -33,18 +35,35 @@ describe("COURSES", () => {
     const available = withStatus("available");
 
     // Assert: the course a student works through is the two lessons the test
-    // page and the admin report already count.
-    expect(available).toHaveLength(1);
-    expect(available[0].lessonSlugs).toEqual([...COURSE_SLUGS]);
+    // page and the admin report count, and the catalog is where that is said.
+    expect(available).toEqual([CERTIFICATES_COURSE]);
+    expect(CERTIFICATES_COURSE.lessonSlugs).toEqual(["certificates", "deploy"]);
   });
 
-  test("announces Kubernetes without pretending it exists", () => {
+  test("announces Docker without pretending it exists", () => {
     // Act
-    const kubernetes = COURSES.find((course) => course.id === "kubernetes");
+    const docker = courseById("docker");
 
     // Assert
-    expect(kubernetes?.status).toBe("coming-soon");
-    expect(kubernetes?.lessonSlugs).toEqual([]);
+    expect(docker?.status).toBe("coming-soon");
+    expect(docker?.lessonSlugs).toEqual([]);
+  });
+
+  test("no longer announces Kubernetes", () => {
+    // Docker replaced it (docs/handoff-items/handoff-docker-course-plan.md).
+    expect(courseById("kubernetes")).toBeNull();
+    expect(COURSES.some((course) => /kubernetes/i.test(course.title))).toBe(
+      false,
+    );
+  });
+
+  test("lists the certificates course first and Docker second", () => {
+    // The finished course leads; Docker opens by saying the student has
+    // already used it in the deploy lesson, which only reads right after it.
+    expect(COURSES.map((course) => course.id)).toEqual([
+      CERTIFICATES_COURSE.id,
+      "docker",
+    ]);
   });
 
   test("gives a course lessons only once it is available", () => {
@@ -58,6 +77,15 @@ describe("COURSES", () => {
     }
   });
 
+  test("no two courses claim the same lesson", () => {
+    // Arrange: a lesson's progress is stored against one course's session, so
+    // a slug in two courses would count for both.
+    const slugs = COURSES.flatMap((course) => course.lessonSlugs);
+
+    // Assert
+    expect(new Set(slugs).size).toBe(slugs.length);
+  });
+
   test("names lessons that are written", async () => {
     // Act: every slug an available course claims is a folder under content.
     const loads = withStatus("available").flatMap((course) =>
@@ -68,6 +96,34 @@ describe("COURSES", () => {
     for (const load of loads) {
       await expect(load).resolves.toMatchObject({ slug: expect.any(String) });
     }
+  });
+});
+
+describe("courseFor", () => {
+  test("finds the course a lesson belongs to", () => {
+    expect(courseFor("certificates")).toBe(CERTIFICATES_COURSE);
+    expect(courseFor("deploy")).toBe(CERTIFICATES_COURSE);
+  });
+
+  test("is null for a slug no course claims", () => {
+    // A URL can name anything; the route that resolves it needs a 404, not a
+    // lesson with no steps.
+    expect(courseFor("kubernetes")).toBeNull();
+    expect(courseFor("")).toBeNull();
+  });
+});
+
+describe("courseById", () => {
+  test("finds a course by the id stored with its sessions", () => {
+    expect(courseById("https-with-your-own-certificates")).toBe(
+      CERTIFICATES_COURSE,
+    );
+  });
+
+  test("is null for an id no course has", () => {
+    // An id comes back out of the database as a string, and a course could be
+    // retired after sessions were stored against it.
+    expect(courseById("retired-course")).toBeNull();
   });
 });
 
@@ -92,8 +148,8 @@ describe("courseStartPath", () => {
   test("points nowhere for a course that is still coming", () => {
     // Arrange
     const course: Course = {
-      id: "kubernetes",
-      title: "Kubernetes",
+      id: "docker",
+      title: "Docker",
       summary: "Later.",
       status: "coming-soon",
       lessonSlugs: [],

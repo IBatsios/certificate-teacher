@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { checkCertificate, parseCertificate } from "@/lib/certificate";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import { listSubmissions, saveSubmission } from "@/lib/certificate-submission";
 import { startOrResume, startOver } from "@/lib/learning-session";
 import { prisma } from "@/lib/prisma";
@@ -17,6 +18,8 @@ const expiredLeaf = readFileSync(
   path.join(FIXTURES, "expired-leaf.crt"),
   "utf8",
 );
+
+const COURSE = CERTIFICATES_COURSE.id;
 
 async function newStudent(): Promise<string> {
   const salt = Math.random().toString(36).slice(2, 10);
@@ -34,7 +37,7 @@ async function submit(userId: string, leafPem: string) {
     throw new Error(`fixture did not parse: ${parsed.reason}`);
   }
   const report = checkCertificate(leafPem, goodRoot);
-  return saveSubmission(userId, parsed.certificate, report);
+  return saveSubmission(userId, COURSE, parsed.certificate, report);
 }
 
 /** Every submission this student has made, across all their sessions. */
@@ -77,7 +80,7 @@ describe("saveSubmission", () => {
   test("attaches the submission to the student's active session", async () => {
     // Arrange
     const userId = await newStudent();
-    const session = await startOrResume(userId);
+    const session = await startOrResume(userId, COURSE);
 
     // Act
     await submit(userId, goodLeaf);
@@ -100,7 +103,12 @@ describe("saveSubmission", () => {
     };
 
     await expect(
-      saveSubmission(userId, withKey, checkCertificate(goodLeaf, goodRoot)),
+      saveSubmission(
+        userId,
+        COURSE,
+        withKey,
+        checkCertificate(goodLeaf, goodRoot),
+      ),
     ).rejects.toThrow(/private key/i);
 
     expect(await countFor(userId)).toBe(0);
@@ -111,7 +119,7 @@ describe("listSubmissions", () => {
   test("a student with none has none", async () => {
     const userId = await newStudent();
 
-    expect(await listSubmissions(userId)).toEqual([]);
+    expect(await listSubmissions(userId, COURSE)).toEqual([]);
   });
 
   test("newest first", async () => {
@@ -121,12 +129,26 @@ describe("listSubmissions", () => {
     await submit(userId, goodLeaf);
 
     // Act
-    const submissions = await listSubmissions(userId);
+    const submissions = await listSubmissions(userId, COURSE);
 
     // Assert
     expect(submissions).toHaveLength(2);
     expect(submissions[0]?.verdict).toBe("passed");
     expect(submissions[1]?.verdict).toBe("failed");
+  });
+
+  test("a submission made in one course is not listed for another", async () => {
+    // Arrange: the submission joins the active session of the course it was
+    // made in, and a session belongs to one course.
+    const userId = await newStudent();
+    await submit(userId, goodLeaf);
+
+    // Act
+    const elsewhere = await listSubmissions(userId, "another-course");
+
+    // Assert
+    expect(elsewhere).toEqual([]);
+    expect(await listSubmissions(userId, COURSE)).toHaveLength(1);
   });
 
   test("starting over leaves the earlier submissions behind", async () => {
@@ -135,10 +157,10 @@ describe("listSubmissions", () => {
     await submit(userId, goodLeaf);
 
     // Act
-    await startOver(userId);
+    await startOver(userId, COURSE);
 
     // Assert
-    expect(await listSubmissions(userId)).toEqual([]);
+    expect(await listSubmissions(userId, COURSE)).toEqual([]);
     // Still on the archived session, not deleted (D33).
     expect(await countFor(userId)).toBe(1);
   });

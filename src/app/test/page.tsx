@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { COURSE_SLUGS, lessonPath } from "@/lib/lesson-routes";
-import { courseProgress } from "@/lib/lesson-progress";
-import { loadLesson } from "@/lib/lesson";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
+import { lessonPath } from "@/lib/lesson-routes";
+import { lessonProgress } from "@/lib/lesson-progress";
+import { loadCourseLessons } from "@/lib/lesson";
 import { startOrResume } from "@/lib/learning-session";
 import {
   loadQuestionBank,
@@ -23,7 +24,11 @@ export default async function TestPage({ searchParams }: PageProps<"/test">) {
 
   const attemptId = firstValue(params.attempt);
   if (attemptId !== undefined) {
-    const attempt = await findAttempt(student.id, attemptId);
+    const attempt = await findAttempt(
+      student.id,
+      CERTIFICATES_COURSE.id,
+      attemptId,
+    );
     return attempt === null ? (
       <QuestionForm bank={bank} message={TEST_MESSAGES["not-found"]} />
     ) : (
@@ -55,12 +60,12 @@ async function unfinishedLessons(
   userId: string,
 ): Promise<ReadonlyArray<string>> {
   const [session, lessons] = await Promise.all([
-    startOrResume(userId),
-    Promise.all(COURSE_SLUGS.map((slug) => loadLesson(slug))),
+    startOrResume(userId, CERTIFICATES_COURSE.id),
+    loadCourseLessons(CERTIFICATES_COURSE),
   ]);
   const done = new Set(session.doneStepKeys);
   return lessons
-    .filter((lesson) => !courseProgress([lesson], done).isComplete)
+    .filter((lesson) => !lessonProgress(lesson.steps, done).isComplete)
     .map((lesson) => lesson.slug);
 }
 

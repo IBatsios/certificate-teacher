@@ -1,13 +1,15 @@
 import type { CertificateVerdict } from "@/generated/prisma/enums";
-import { loadLesson } from "@/lib/lesson";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
+import { loadCourseLessons } from "@/lib/lesson";
 import { courseProgress } from "@/lib/lesson-progress";
-import { COURSE_SLUGS } from "@/lib/lesson-routes";
 import { prisma } from "@/lib/prisma";
 import { loadQuestionBank } from "@/lib/questions";
 
-// What the admin sees: one row per student, drawn from their active session.
-// A student who has started over reads as empty here, because the run they are
-// on is empty; the old run is kept and is never deleted (D33, D62).
+// What the admin sees: one row per student, drawn from their active session in
+// the certificates course. A student who has started over reads as empty here,
+// because the run they are on is empty; the old run is kept and is never
+// deleted (D33, D62). The report is one course wide until Task 16 makes it
+// show both.
 
 export type StudentReportRow = Readonly<{
   userId: string;
@@ -46,7 +48,7 @@ export async function buildReport(): Promise<ReadonlyArray<StudentReportRow>> {
         email: true,
         createdAt: true,
         learningSessions: {
-          where: { status: "active" },
+          where: { status: "active", courseId: CERTIFICATES_COURSE.id },
           orderBy: [{ startedAt: "desc" }, { id: "desc" }],
           take: 1,
           select: {
@@ -71,7 +73,7 @@ export async function buildReport(): Promise<ReadonlyArray<StudentReportRow>> {
         },
       },
     }),
-    Promise.all(COURSE_SLUGS.map((slug) => loadLesson(slug))),
+    loadCourseLessons(CERTIFICATES_COURSE),
     loadQuestionBank(),
   ]);
 

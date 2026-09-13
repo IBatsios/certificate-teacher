@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import { listArchivedSessions, startOrResume } from "@/lib/learning-session";
 import { loadLesson } from "@/lib/lesson";
 import { lessonMessageFor, lessonPath } from "@/lib/lesson-routes";
@@ -39,8 +40,8 @@ export default async function CertificatesLessonPage({
   const params = await searchParams;
   const [lesson, session, earlier] = await Promise.all([
     loadLesson(LESSON_SLUG),
-    startOrResume(student.id),
-    listArchivedSessions(student.id),
+    startOrResume(student.id, CERTIFICATES_COURSE.id),
+    listArchivedSessions(student.id, CERTIFICATES_COURSE.id),
   ]);
 
   return (

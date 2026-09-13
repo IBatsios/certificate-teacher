@@ -8,6 +8,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { courseFor, type Course } from "@/lib/courses";
 import {
   markStepDone,
   markStepNotDone,
@@ -36,7 +37,10 @@ export async function tickStep(
   if (stepKey === null) {
     redirect(lessonPathWithMessage(slug, "unknown-step"));
   }
-  const outcome = await trySave(slug, () => markStepDone(student.id, stepKey));
+  const course = courseOf(slug);
+  const outcome = await trySave(slug, () =>
+    markStepDone(student.id, course.id, stepKey),
+  );
   redirect(outcome ?? lessonPathAtStep(slug, stepKey));
 }
 
@@ -50,8 +54,9 @@ export async function untickStep(
   if (stepKey === null) {
     redirect(lessonPathWithMessage(slug, "unknown-step"));
   }
+  const course = courseOf(slug);
   const outcome = await trySave(slug, () =>
-    markStepNotDone(student.id, stepKey),
+    markStepNotDone(student.id, course.id, stepKey),
   );
   redirect(outcome ?? lessonPathAtStep(slug, stepKey));
 }
@@ -59,8 +64,22 @@ export async function untickStep(
 /** Archives the current session and starts an empty one. */
 export async function restartSession(slug: string): Promise<void> {
   const student = await requireRole("student");
-  const outcome = await trySave(slug, () => startOver(student.id));
+  const course = courseOf(slug);
+  const outcome = await trySave(slug, () => startOver(student.id, course.id));
   redirect(outcome ?? lessonPathWithMessage(slug, "started-over"));
+}
+
+/**
+ * The course the lesson belongs to. The slug is a literal in the lesson's own
+ * actions module, so a slug no course claims is a mistake in code, and this
+ * says so rather than saving progress against nothing.
+ */
+function courseOf(slug: string): Course {
+  const course = courseFor(slug);
+  if (course === null) {
+    throw new Error(`No course claims the lesson "${slug}".`);
+  }
+  return course;
 }
 
 /** The submitted step key, or null unless it is a step of this lesson. */

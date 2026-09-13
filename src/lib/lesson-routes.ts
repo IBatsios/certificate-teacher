@@ -1,13 +1,10 @@
 // How the lesson pages address themselves, and the few things they can say
 // when a form comes back. Shared by every lesson, so a second lesson needs no
-// copy of it. Pure: no database, no request, no React.
+// copy of it. Which lessons exist, and which course each belongs to, is the
+// catalog's business in `src/lib/courses.ts`. Pure: no database, no request,
+// no React.
 
 export const LESSONS_ROOT = "/lessons";
-
-// The lessons a student works through, in order. "Finished" means every step
-// of every one of these, not either lesson alone. What the course they belong
-// to is called, and what else Teacher will teach, is in `src/lib/courses.ts`.
-export const COURSE_SLUGS = ["certificates", "deploy"] as const;
 
 // Messages a lesson page can show, keyed by the value in `?message=`. One of
 // them reports success, so the parameter is not called `error`.

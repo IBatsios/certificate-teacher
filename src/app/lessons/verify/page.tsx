@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CERTIFICATES_COURSE } from "@/lib/courses";
 import {
   CERTIFICATE_CHECKS,
   type CertificateCheckKey,
@@ -17,7 +18,7 @@ export default async function VerifyPage({
 }: PageProps<"/lessons/verify">) {
   const student = await requireRole("student");
   const params = await searchParams;
-  const submissions = await listSubmissions(student.id);
+  const submissions = await listSubmissions(student.id, CERTIFICATES_COURSE.id);
   const message = verifyMessageFor(params.message);
   const latest = submissions[0];
 

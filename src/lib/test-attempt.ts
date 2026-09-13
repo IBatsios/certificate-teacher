@@ -1,9 +1,12 @@
 import { Prisma } from "@/generated/prisma/client";
+import { activeSessionId, findActiveSessionId } from "@/lib/learning-session";
 import { prisma } from "@/lib/prisma";
 import type { ScoreResult } from "@/lib/score";
 
 export type AttemptSummary = Readonly<{
   id: string;
+  /** Which course's test it was, by the id in `src/lib/courses.ts`. */
+  courseId: string;
   passed: boolean;
   correct: number;
   total: number;
@@ -14,6 +17,7 @@ export type AttemptSummary = Readonly<{
 
 const SUMMARY_SELECT = {
   id: true,
+  courseId: true,
   passed: true,
   correct: true,
   total: true,
@@ -26,10 +30,11 @@ const SERIALIZABLE = {
 };
 
 /**
- * Records one attempt against the student's active session, creating the
- * session when they have none. Finding the session and writing the attempt
- * share a transaction, so a "start over" from another tab cannot leave the
- * attempt on the session that was just archived.
+ * Records one attempt at the course's test against the student's active
+ * session in that course, creating the session when they have none. Finding
+ * the session and writing the attempt share a transaction, so a "start over"
+ * from another tab cannot leave the attempt on the session that was just
+ * archived.
  *
  * The score is written down rather than recomputed later: the questions and
  * the pass mark can both change, and an old result should still say what the
@@ -37,13 +42,15 @@ const SERIALIZABLE = {
  */
 export async function recordAttempt(
   userId: string,
+  courseId: string,
   result: ScoreResult,
 ): Promise<AttemptSummary> {
   return prisma.$transaction(async (tx) => {
-    const sessionId = await activeSessionId(tx, userId);
+    const sessionId = await activeSessionId(tx, userId, courseId);
     const row = await tx.testAttempt.create({
       data: {
         userId,
+        courseId,
         sessionId,
         passed: result.passed,
         correct: result.correct,
@@ -56,55 +63,39 @@ export async function recordAttempt(
   }, SERIALIZABLE);
 }
 
-/** The attempts in the student's active session, newest first. */
+/** The attempts in the student's active session in the course, newest first. */
 export async function listAttempts(
   userId: string,
+  courseId: string,
 ): Promise<ReadonlyArray<AttemptSummary>> {
-  const session = await prisma.learningSession.findFirst({
-    where: { userId, status: "active" },
-    select: { id: true },
-    orderBy: [{ startedAt: "desc" }, { id: "desc" }],
-  });
-  if (session === null) {
+  const sessionId = await findActiveSessionId(userId, courseId);
+  if (sessionId === null) {
     return [];
   }
   const rows = await prisma.testAttempt.findMany({
-    where: { sessionId: session.id },
+    where: { sessionId },
     select: SUMMARY_SELECT,
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
   return rows.map(toSummary);
 }
 
-/** One attempt of this student's, by id. Null when it is not theirs. */
+/**
+ * One attempt of this student's at this course's test, by id. Null when it is
+ * not theirs or not this course's: the result page names the focus areas
+ * with the course's own topic titles, so an attempt from another course
+ * would read wrong there.
+ */
 export async function findAttempt(
   userId: string,
+  courseId: string,
   attemptId: string,
 ): Promise<AttemptSummary | null> {
   const row = await prisma.testAttempt.findFirst({
-    where: { id: attemptId, userId },
+    where: { id: attemptId, userId, courseId },
     select: SUMMARY_SELECT,
   });
   return row === null ? null : toSummary(row);
-}
-
-async function activeSessionId(
-  tx: Prisma.TransactionClient,
-  userId: string,
-): Promise<string> {
-  const active = await tx.learningSession.findFirst({
-    where: { userId, status: "active" },
-    select: { id: true },
-    orderBy: [{ startedAt: "desc" }, { id: "desc" }],
-  });
-  if (active !== null) {
-    return active.id;
-  }
-  const created = await tx.learningSession.create({
-    data: { userId },
-    select: { id: true },
-  });
-  return created.id;
 }
 
 function toSummary(
@@ -112,6 +103,7 @@ function toSummary(
 ): AttemptSummary {
   return {
     id: row.id,
+    courseId: row.courseId,
     passed: row.passed,
     correct: row.correct,
     total: row.total,
