@@ -6,7 +6,7 @@
 
 **Blocked by:** 10.
 
-**Status:** built on `feature/one-lesson-route`; pull request open, see below.
+**Status:** built on `feature/one-lesson-route`, pull request #25 open.
 
 ## Why
 
